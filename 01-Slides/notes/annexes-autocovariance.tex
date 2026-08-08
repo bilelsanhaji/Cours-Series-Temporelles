@@ -1,0 +1,912 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+\PassOptionsToPackage{dvipsnames,svgnames,x11names}{xcolor}
+%
+\documentclass[
+  letterpaper,
+  DIV=11,
+  numbers=noendperiod]{scrartcl}
+
+\usepackage{amsmath,amssymb}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+\usepackage{lmodern}
+\ifPDFTeX\else  
+    % xetex/luatex font selection
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+% Make \paragraph and \subparagraph free-standing
+\makeatletter
+\ifx\paragraph\undefined\else
+  \let\oldparagraph\paragraph
+  \renewcommand{\paragraph}{
+    \@ifstar
+      \xxxParagraphStar
+      \xxxParagraphNoStar
+  }
+  \newcommand{\xxxParagraphStar}[1]{\oldparagraph*{#1}\mbox{}}
+  \newcommand{\xxxParagraphNoStar}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+  \let\oldsubparagraph\subparagraph
+  \renewcommand{\subparagraph}{
+    \@ifstar
+      \xxxSubParagraphStar
+      \xxxSubParagraphNoStar
+  }
+  \newcommand{\xxxSubParagraphStar}[1]{\oldsubparagraph*{#1}\mbox{}}
+  \newcommand{\xxxSubParagraphNoStar}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+\makeatother
+
+
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}\usepackage{longtable,booktabs,array}
+\usepackage{calc} % for calculating minipage widths
+% Correct order of tables after \paragraph or \subparagraph
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
+\makeatother
+% Allow footnotes in longtable head/foot
+\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
+\makesavenoteenv{longtable}
+\usepackage{graphicx}
+\makeatletter
+\newsavebox\pandoc@box
+\newcommand*\pandocbounded[1]{% scales image to fit in text height/width
+  \sbox\pandoc@box{#1}%
+  \Gscale@div\@tempa{\textheight}{\dimexpr\ht\pandoc@box+\dp\pandoc@box\relax}%
+  \Gscale@div\@tempb{\linewidth}{\wd\pandoc@box}%
+  \ifdim\@tempb\p@<\@tempa\p@\let\@tempa\@tempb\fi% select the smaller of both
+  \ifdim\@tempa\p@<\p@\scalebox{\@tempa}{\usebox\pandoc@box}%
+  \else\usebox{\pandoc@box}%
+  \fi%
+}
+% Set default figure placement to htbp
+\def\fps@figure{htbp}
+\makeatother
+
+\KOMAoption{captions}{tableheading}
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\AtBeginDocument{%
+\ifdefined\contentsname
+  \renewcommand*\contentsname{Table des matières}
+\else
+  \newcommand\contentsname{Table des matières}
+\fi
+\ifdefined\listfigurename
+  \renewcommand*\listfigurename{Liste des Figures}
+\else
+  \newcommand\listfigurename{Liste des Figures}
+\fi
+\ifdefined\listtablename
+  \renewcommand*\listtablename{Liste des Tables}
+\else
+  \newcommand\listtablename{Liste des Tables}
+\fi
+\ifdefined\figurename
+  \renewcommand*\figurename{Figure}
+\else
+  \newcommand\figurename{Figure}
+\fi
+\ifdefined\tablename
+  \renewcommand*\tablename{Table}
+\else
+  \newcommand\tablename{Table}
+\fi
+}
+\@ifpackageloaded{float}{}{\usepackage{float}}
+\floatstyle{ruled}
+\@ifundefined{c@chapter}{\newfloat{codelisting}{h}{lop}}{\newfloat{codelisting}{h}{lop}[chapter]}
+\floatname{codelisting}{Listing}
+\newcommand*\listoflistings{\listof{codelisting}{Liste des Listings}}
+\makeatother
+\makeatletter
+\makeatother
+\makeatletter
+\@ifpackageloaded{caption}{}{\usepackage{caption}}
+\@ifpackageloaded{subcaption}{}{\usepackage{subcaption}}
+\makeatother
+
+\ifLuaTeX
+\usepackage[bidi=basic]{babel}
+\else
+\usepackage[bidi=default]{babel}
+\fi
+\babelprovide[main,import]{french}
+% get rid of language-specific shorthands (see #6817):
+\let\LanguageShortHands\languageshorthands
+\def\languageshorthands#1{}
+\usepackage{bookmark}
+
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  pdftitle={Calcul de l'Autocovariance et des Autocorrélations},
+  pdfauthor={Annexes},
+  pdflang={fr},
+  colorlinks=true,
+  linkcolor={blue},
+  filecolor={Maroon},
+  citecolor={Blue},
+  urlcolor={Blue},
+  pdfcreator={LaTeX via pandoc}}
+
+
+\title{Calcul de l'Autocovariance et des Autocorrélations}
+\author{Annexes}
+\date{Invalid Date}
+
+\begin{document}
+\maketitle
+
+
+\section{Calcul de l'Autocovariance et des
+Autocorrélations}\label{calcul-de-lautocovariance-et-des-autocorruxe9lations}
+
+Cette annexe couvre la dérivation de la fonction d'autocorrélation (ACF)
+pour les modèles MA(1), MA(Q), AR(1), AR(2), AR(3) et ARMA(1,1). Tout au
+long de cette annexe, \(\{ \varepsilon_t \}\) est supposé être un
+processus de bruit blanc, et les paramètres des processus sont toujours
+supposés être cohérents avec la stationnarité de covariance. Tous les
+modèles sont supposés avoir une moyenne de 0, une hypothèse faite sans
+perte de généralité puisque les autocovariances sont définies en
+utilisant des séries temporelles décentrées,
+
+\[
+\gamma_s = E[(Y_t - \mu)(Y_{t-s} - \mu)]
+\]
+
+où \(\mu = E[Y_t]\). Rappelons que l'autocorrélation est simplement le
+rapport de l'autocovariance d'ordre \(s\) à la variance,
+
+\[
+\rho_s = \frac{\gamma_s}{\gamma_0}.
+\]
+
+Cette annexe présente deux méthodes pour dériver les autocorrélations
+des processus ARMA : la substitution arrière et les équations de
+Yule-Walker, un ensemble de \(k\) équations avec \(k\) inconnues où
+\(\gamma_0, \gamma_1, \ldots, \gamma_{k-1}\) sont la solution.
+
+\subsection{A.1 Équations de
+Yule-Walker}\label{a.1-uxe9quations-de-yule-walker}
+
+Les équations de Yule-Walker sont un système linéaire de
+\(\max(P, Q) + 1\) équations (dans un ARMA(P, Q)) où la solution du
+système est la variance à long terme et les premières \(k-1\)
+autocovariances. Les équations de Yule-Walker sont formées en égalisant
+la définition d'une autocovariance avec une expansion produite en
+substituant la valeur contemporaine de \(Y_t\). Par exemple, supposons
+que \(Y_t\) suit un processus AR(2),
+
+\[
+Y_t = \phi_1 Y_{t-1} + \phi_2 Y_{t-2} + \varepsilon_t
+\]
+
+La variance doit satisfaire
+
+\[
+\begin{aligned}
+E[Y_t Y_t] &= E[Y_t (\phi_1 Y_{t-1} + \phi_2 Y_{t-2} + \varepsilon_t)] \\
+E[Y_t^2] &= E[\phi_1 Y_t Y_{t-1} + \phi_2 Y_t Y_{t-2} + Y_t \varepsilon_t] \\
+V[Y_t] &= \phi_1 E[Y_t Y_{t-1}] + \phi_2 E[Y_t Y_{t-2}] + E[Y_t \varepsilon_t].
+\end{aligned}
+\]
+
+Dans l'équation finale ci-dessus, les termes de la forme
+\(E[Y_t Y_{t-s}]\) sont remplacés par leurs valeurs de population,
+\(\gamma_s\), et \(E[Y_t \varepsilon_t]\) est remplacé par sa valeur de
+population, \(\sigma^2\).
+
+\[
+\begin{aligned}
+V[Y_t Y_t] &= \phi_1 E[Y_t Y_{t-1}] + \phi_2 E[Y_t Y_{t-2}] + E[Y_t \varepsilon_t] \\
+\gamma_0 &= \phi_1 \gamma_1 + \phi_2 \gamma_2 + \sigma^2
+\end{aligned}
+\]
+
+et donc la variance à long terme est une fonction des deux premières
+autocovariances, des paramètres du modèle, et de la variance des
+innovations. Cela peut être répété pour la première autocovariance,
+
+\[
+\begin{aligned}
+E[Y_t Y_{t-1}] &= \phi_1 E[Y_{t-1} Y_{t-1}] + \phi_2 E[Y_{t-1} Y_{t-2}] + E[Y_{t-1} \varepsilon_t] \\
+\gamma_1 &= \phi_1 \gamma_0 + \phi_2 \gamma_1,
+\end{aligned}
+\]
+
+et pour la deuxième autocovariance,
+
+\[
+\begin{aligned}
+E[Y_t Y_{t-2}] &= \phi_1 E[Y_{t-2} Y_{t-1}] + \phi_2 E[Y_{t-2} Y_{t-2}] + E[Y_{t-2} \varepsilon_t] \\
+\gamma_2 &= \phi_1 \gamma_1 + \phi_2 \gamma_0.
+\end{aligned}
+\]
+
+Ensemble, les trois dernières équations forment un système de trois
+équations avec trois inconnues. La méthode de Yule-Walker repose
+fortement sur la stationnarité de covariance et donc
+\(E[Y_t Y_{t-j}] = E[Y_{t-h} Y_{t-h-j}]\) pour tout \(h\). Cette
+propriété des processus stationnaires de covariance a été utilisée à
+plusieurs reprises pour former les équations de Yule-Walker puisque
+\(E[Y_t Y_t] = E[Y_{t-1} Y_{t-1}] = E[Y_{t-2} Y_{t-2}] = \gamma_0\) et
+\(E[Y_t Y_{t-1}] = E[Y_{t-1} Y_{t-2}] = \gamma_1\). La méthode de
+Yule-Walker sera démontrée pour plusieurs modèles, en commençant par un
+simple MA(1) et en allant jusqu'à un ARMA(1,1).
+
+\subsubsection{A.1.1 MA(1)}\label{a.1.1-ma1}
+
+Les autocorrelations du MA(1) sont simples à dériver.
+
+\[
+Y_t = \theta_1 \varepsilon_{t-1} + \varepsilon_t
+\]
+
+Les équations de Yule-Walker sont
+
+\[
+\begin{aligned}
+E[Y_t Y_t] &= E[\theta_1 \varepsilon_{t-1} Y_t] + E[\varepsilon_t Y_t] \\
+E[Y_t Y_{t-1}] &= E[\theta_1 \varepsilon_{t-1} Y_{t-1}] + E[\varepsilon_t Y_{t-1}] \\
+E[Y_t Y_{t-2}] &= E[\theta_1 \varepsilon_{t-1} Y_{t-2}] + E[\varepsilon_t Y_{t-2}]
+\end{aligned}
+\]
+
+\[
+\begin{aligned}
+\gamma_0 &= \theta_1^2 \sigma^2 + \sigma^2 \\
+\gamma_1 &= \theta_1 \sigma^2 \\
+\gamma_2 &= 0
+\end{aligned}
+\]
+
+De plus, \(\gamma_s\) et \(\rho_s\), pour \(s \geq 2\), sont nuls en
+raison de la propriété de bruit blanc des résidus, et donc les
+autocorrelations sont
+
+\[
+\rho_1 = \frac{\theta_1 \sigma^2}{\theta_1^2 \sigma^2 + \sigma^2} = \frac{\theta_1}{1 + \theta_1^2}
+\]
+
+\[
+\rho_2 = 0.
+\]
+
+\subsubsection{A.1.2 MA(Q)}\label{a.1.2-maq}
+
+Les équations de Yule-Walker peuvent être construites et résolues pour
+tout MA(Q), et la structure de l'autocovariance est simple à détecter en
+construisant un sous-ensemble du système complet.
+
+\[
+\begin{aligned}
+E[Y_t Y_t] &= E[\theta_1 \varepsilon_{t-1} Y_t] + E[\theta_2 \varepsilon_{t-2} Y_t] + E[\theta_3 \varepsilon_{t-3} Y_t] + \ldots + E[\theta_Q \varepsilon_{t-Q} Y_t] \\
+\gamma_0 &= \theta_1^2 \sigma^2 + \theta_2^2 \sigma^2 + \theta_3^2 \sigma^2 + \ldots + \theta_Q^2 \sigma^2 + \sigma^2 \\
+&= \sigma^2 (1 + \theta_1^2 + \theta_2^2 + \theta_3^2 + \ldots + \theta_Q^2)
+\end{aligned}
+\]
+
+\[
+\begin{aligned}
+E[Y_t Y_{t-1}] &= E[\theta_1 \varepsilon_{t-1} Y_{t-1}] + E[\theta_2 \varepsilon_{t-2} Y_{t-1}] + E[\theta_3 \varepsilon_{t-3} Y_{t-1}] + \ldots + E[\theta_Q \varepsilon_{t-Q} Y_{t-1}] \\
+\gamma_1 &= \theta_1 \sigma^2 + \theta_1 \theta_2 \sigma^2 + \theta_2 \theta_3 \sigma^2 + \ldots + \theta_{Q-1} \theta_Q \sigma^2 \\
+&= \sigma^2 (\theta_1 + \theta_1 \theta_2 + \theta_2 \theta_3 + \ldots + \theta_{Q-1} \theta_Q)
+\end{aligned}
+\]
+
+\[
+\begin{aligned}
+E[Y_t Y_{t-2}] &= E[\theta_1 \varepsilon_{t-1} Y_{t-2}] + E[\theta_2 \varepsilon_{t-2} Y_{t-2}] + E[\theta_3 \varepsilon_{t-3} Y_{t-2}] + \ldots + E[\theta_Q \varepsilon_{t-Q} Y_{t-2}] \\
+\gamma_2 &= \theta_2 \sigma^2 + \theta_1 \theta_3 \sigma^2 + \theta_2 \theta_4 \sigma^2 + \ldots + \theta_{Q-2} \theta_Q \sigma^2 \\
+&= \sigma^2 (\theta_2 + \theta_1 \theta_3 + \theta_2 \theta_4 + \ldots + \theta_{Q-2} \theta_Q)
+\end{aligned}
+\]
+
+Le schéma qui émerge montre que
+
+\[
+\gamma_s = \theta_s \sigma^2 + \sum_{i=1}^{Q-s} \theta_i \theta_{i+s} \sigma^2 = \sigma^2 \left( \theta_s + \sum_{i=1}^{Q-s} \theta_i \theta_{i+s} \right)
+\]
+
+et donc, \(\gamma_s\) est une somme de \(Q-s + 1\) termes. Les
+autocorrélations sont
+
+\[
+\rho_1 = \frac{\theta_1 + \sum_{i=1}^{Q-1} \theta_i \theta_{i+1}}{1 + \sum_{i=1}^{Q} \theta_i^2}
+\]
+
+\[
+\rho_2 = \frac{\theta_2 + \sum_{i=1}^{Q-2} \theta_i \theta_{i+2}}{1 + \sum_{i=1}^{Q} \theta_i^2}
+\]
+
+\[
+\vdots
+\]
+
+\[
+\rho_Q = \frac{\theta_Q}{1 + \sum_{i=1}^{Q} \theta_i^2}
+\]
+
+\[
+\rho_{Q+s} = 0, \quad s \geq 0
+\]
+
+\subsubsection{A.1.3 AR(1)}\label{a.1.3-ar1}
+
+La méthode de Yule-Walker nécessite \(\max(P, Q) + 1\) équations pour
+calculer l'autocovariance d'un processus ARMA(P, Q), et dans le cas d'un
+AR(1), deux équations sont requises (la troisième est incluse pour
+établir ce point).
+
+\[
+Y_t = \phi_1 Y_{t-1} + \varepsilon_t
+\]
+
+\[
+\begin{aligned}
+E[Y_t Y_t] &= E[\phi_1 Y_{t-1} Y_t] + E[\varepsilon_t Y_t] \\
+E[Y_t Y_{t-1}] &= E[\phi_1 Y_{t-1} Y_{t-1}] + E[\varepsilon_t Y_{t-1}] \\
+E[Y_t Y_{t-2}] &= E[\phi_1 Y_{t-1} Y_{t-2}] + E[\varepsilon_t Y_{t-2}]
+\end{aligned}
+\]
+
+Ces équations peuvent être réécrites en termes d'autocovariances, de
+paramètres du modèle et de \(\sigma^2\) en prenant l'espérance et en
+notant que \(E[\varepsilon_t Y_t] = \sigma^2\) puisque
+\(Y_t = \varepsilon_t + \phi_1 \varepsilon_{t-1} + \phi_1^2 \varepsilon_{t-2} + \ldots\)
+et \(E[\varepsilon_t Y_{t-j}] = 0\) pour \(j > 0\) car
+\(\{\varepsilon_t\}\) est un processus de bruit blanc.
+
+\[
+\begin{aligned}
+\gamma_0 &= \phi_1 \gamma_1 + \sigma^2 \\
+\gamma_1 &= \phi_1 \gamma_0 \\
+\gamma_2 &= \phi_1 \gamma_1
+\end{aligned}
+\]
+
+La troisième équation est redondante car \(\gamma_2\) est entièrement
+déterminé par \(\gamma_1\) et \(\phi_1\), et les autocovariances d'ordre
+supérieur sont similairement redondantes puisque
+\(\gamma_s = \phi_1 \gamma_{s-1}\) pour tout \(s\). Les deux premières
+équations peuvent être résolues pour \(\gamma_0\) et \(\gamma_1\),
+
+\[
+\begin{aligned}
+\gamma_0 &= \phi_1 \gamma_1 + \sigma^2 \\
+\gamma_1 &= \phi_1 \gamma_0 \\
+\Rightarrow \gamma_0 &= \phi_1^2 \gamma_0 + \sigma^2 \\
+\Rightarrow \gamma_0 - \phi_1^2 \gamma_0 &= \sigma^2 \\
+\Rightarrow \gamma_0 (1 - \phi_1^2) &= \sigma^2 \\
+\Rightarrow \gamma_0 &= \frac{\sigma^2}{1 - \phi_1^2}
+\end{aligned}
+\]
+
+et
+
+\[
+\begin{aligned}
+\gamma_1 &= \phi_1 \gamma_0 \\
+\Rightarrow \gamma_1 &= \phi_1 \frac{\sigma^2}{1 - \phi_1^2}.
+\end{aligned}
+\]
+
+Les autocovariances restantes peuvent être calculées en utilisant la
+récurrence \(\gamma_s = \phi_1 \gamma_{s-1}\), et donc
+
+\[
+\gamma_s = \phi_1^s \frac{\sigma^2}{1 - \phi_1^2}.
+\]
+
+Enfin, les autocorrélations peuvent être calculées comme des rapports
+d'autocovariances,
+
+\[
+\rho_1 = \frac{\gamma_1}{\gamma_0} = \phi_1
+\]
+
+\[
+\rho_s = \frac{\gamma_s}{\gamma_0} = \phi_1^s.
+\]
+
+\subsubsection{A.1.4 AR(2)}\label{a.1.4-ar2}
+
+Les autocorrélations dans un AR(2)
+
+\[
+Y_t = \phi_1 Y_{t-1} + \phi_2 Y_{t-2} + \varepsilon_t
+\]
+
+peuvent être calculées de manière similaire en utilisant le système
+d'équations de Yule-Walker avec \(\max(P, Q) + 1\) équations,
+
+\[
+\begin{aligned}
+E[Y_t Y_t] &= \phi_1 E[Y_{t-1} Y_t] + \phi_2 E[Y_{t-2} Y_t] + E[\varepsilon_t Y_t] \\
+E[Y_t Y_{t-1}] &= \phi_1 E[Y_{t-1} Y_{t-1}] + \phi_2 E[Y_{t-2} Y_{t-1}] + E[\varepsilon_t Y_{t-1}] \\
+E[Y_t Y_{t-2}] &= \phi_1 E[Y_{t-1} Y_{t-2}] + \phi_2 E[Y_{t-2} Y_{t-2}] + E[\varepsilon_t Y_{t-2}]
+\end{aligned}
+\]
+
+puis en remplaçant les espérances par leurs contreparties
+populationnelles, \(\gamma_0\), \(\gamma_1\), \(\gamma_2\) et
+\(\sigma^2\).
+
+\[
+\begin{aligned}
+\gamma_0 &= \phi_1 \gamma_1 + \phi_2 \gamma_2 + \sigma^2 \\
+\gamma_1 &= \phi_1 \gamma_0 + \phi_2 \gamma_1 \\
+\gamma_2 &= \phi_1 \gamma_1 + \phi_2 \gamma_0
+\end{aligned}
+\]
+
+De plus, il doit être vrai que
+\(\gamma_s = \phi_1 \gamma_{s-1} + \phi_2 \gamma_{s-2}\) pour
+\(s \geq 2\). Pour résoudre ce système d'équations, divisons les
+équations d'autocovariance par \(\gamma_0\), la variance à long terme.
+En omettant la première équation, le système se réduit à deux équations
+avec deux inconnues,
+
+\[
+\begin{aligned}
+\rho_1 &= \phi_1 \rho_0 + \phi_2 \rho_1 \\
+\rho_2 &= \phi_1 \rho_1 + \phi_2 \rho_0
+\end{aligned}
+\]
+
+puisque \(\rho_0 = \gamma_0 / \gamma_0 = 1\).
+
+\[
+\begin{aligned}
+\rho_1 &= \phi_1 + \phi_2 \rho_1 \\
+\rho_1 - \phi_2 \rho_1 &= \phi_1 \\
+\rho_1 (1 - \phi_2) &= \phi_1 \\
+\rho_1 &= \frac{\phi_1}{1 - \phi_2}
+\end{aligned}
+\]
+
+et
+
+\[
+\begin{aligned}
+\rho_2 &= \phi_1 \rho_1 + \phi_2 \\
+&= \phi_1 \left( \frac{\phi_1}{1 - \phi_2} \right) + \phi_2 \\
+&= \frac{\phi_1^2 + \phi_2 (1 - \phi_2)}{1 - \phi_2} \\
+&= \frac{\phi_1^2 + \phi_2 - \phi_2^2}{1 - \phi_2}
+\end{aligned}
+\]
+
+Puisque \(\rho_s = \phi_1 \rho_{s-1} + \phi_2 \rho_{s-2}\), ces deux
+premières autocorrélations sont suffisantes pour calculer les autres
+autocorrélations,
+
+\[
+\rho_3 = \phi_1 \rho_2 + \phi_2 \rho_1 = \frac{\phi_1 (\phi_1^2 + \phi_2 - \phi_2^2) + \phi_2 \phi_1}{1 - \phi_2}
+\]
+
+et la variance à long terme de \(Y_t\),
+
+\[
+\begin{aligned}
+\gamma_0 &= \phi_1 \gamma_1 + \phi_2 \gamma_2 + \sigma^2 \\
+\gamma_0 - \phi_1 \gamma_1 - \phi_2 \gamma_2 &= \sigma^2 \\
+\gamma_0 (1 - \phi_1 \rho_1 - \phi_2 \rho_2) &= \sigma^2 \\
+\gamma_0 &= \frac{\sigma^2}{1 - \phi_1 \rho_1 - \phi_2 \rho_2}
+\end{aligned}
+\]
+
+La solution finale est calculée en substituant \(\rho_1\) et \(\rho_2\),
+
+\[
+\begin{aligned}
+\gamma_0 &= \frac{\sigma^2}{1-\phi_1\frac{\phi_1}{1-\phi_2}-\phi_2\frac{\phi_1^2 + \phi_2 - \phi_2^2}{1 - \phi_2}}\\
+         &= \frac{1 - \phi_2}{1 + \phi_2} \cdot \frac{\sigma^2}{(\phi_1 + \phi_2 - 1)(\phi_2 - \phi_1 - 1)}
+\end{aligned}
+\]
+
+\subsubsection{A.1.5 AR(3)}\label{a.1.5-ar3}
+
+Commencez par construire les équations de Yule-Walker, \[
+\begin{aligned}
+\mathbb{E}[Y_t Y_t] &= \phi_1 \mathbb{E}[Y_{t-1} Y_t] + \phi_2 \mathbb{E}[Y_{t-2} Y_t] + \phi_3 \mathbb{E}[Y_{t-3} Y_t] + \mathbb{E}[\varepsilon_t Y_t] \\
+\mathbb{E}[Y_t Y_{t-1}] &= \phi_1 \mathbb{E}[Y_{t-1} Y_{t-1}] + \phi_2 \mathbb{E}[Y_{t-2} Y_{t-1}] + \phi_3 \mathbb{E}[Y_{t-3} Y_{t-1}] + \mathbb{E}[\varepsilon_t Y_{t-1}] \\
+\mathbb{E}[Y_t Y_{t-2}] &= \phi_1 \mathbb{E}[Y_{t-1} Y_{t-2}] + \phi_2 \mathbb{E}[Y_{t-2} Y_{t-2}] + \phi_3 \mathbb{E}[Y_{t-3} Y_{t-2}] + \mathbb{E}[\varepsilon_t Y_{t-2}] \\
+\mathbb{E}[Y_t Y_{t-3}] &= \phi_1 \mathbb{E}[Y_{t-1} Y_{t-3}] + \phi_2 \mathbb{E}[Y_{t-2} Y_{t-3}] + \phi_3 \mathbb{E}[Y_{t-3} Y_{t-3}] + \mathbb{E}[\varepsilon_t Y_{t-4}].
+\end{aligned}
+\]
+
+En remplaçant les espérances par leurs valeurs populationnelles,
+\(\gamma_0, \gamma_1, \dots\) et \(\sigma^2\), les équations de
+Yule-Walker peuvent être réécrites comme suit : \[
+\begin{aligned}
+\gamma_0 &= \phi_1 \gamma_1 + \phi_2 \gamma_2 + \phi_3 \gamma_3 + \sigma^2 \\
+\gamma_1 &= \phi_1 \gamma_0 + \phi_2 \gamma_1 + \phi_3 \gamma_2 \\
+\gamma_2 &= \phi_1 \gamma_1 + \phi_2 \gamma_0 + \phi_3 \gamma_1 \\
+\gamma_3 &= \phi_1 \gamma_2 + \phi_2 \gamma_1 + \phi_3 \gamma_0
+\end{aligned}
+\] et la relation récursive
+\(\gamma_s = \phi_1 \gamma_{s-1} + \phi_2 \gamma_{s-2} + \phi_3 \gamma_{s-3}\)
+peut être observée pour \(s \geq 3\).
+
+En omettant la première condition et en divisant par \(\gamma_0\), \[
+\begin{aligned}
+\rho_1 &= \phi_1 \rho_0 + \phi_2 \rho_1 + \phi_3 \rho_2 \\
+\rho_2 &= \phi_1 \rho_1 + \phi_2 \rho_0 + \phi_3 \rho_1 \\
+\rho_3 &= \phi_1 \rho_2 + \phi_2 \rho_1 + \phi_3 \rho_0.
+\end{aligned}
+\] Cela laisse trois équations à trois inconnues puisque
+\(\rho_0 = \gamma_0 / \gamma_0 = 1\).
+
+\[
+\begin{aligned}
+\rho_1 &= \phi_1 + \phi_2 \rho_1 + \phi_3 \rho_2 \\
+\rho_2 &= \phi_1 \rho_1 + \phi_2 + \phi_3 \rho_1 \\
+\rho_3 &= \phi_1 \rho_2 + \phi_2 \rho_1 + \phi_3
+\end{aligned}
+\]
+
+Après quelques calculs fastidieux, la solution à ce système est : \[
+\begin{aligned}
+\rho_1 &= \frac{\phi_1 + \phi_2 \phi_3}{1 - \phi_2 - \phi_1 \phi_3 - \phi_3^2} \\
+\rho_2 &= \frac{\phi_2 + \phi_1^2 + \phi_3 \phi_1 - \phi_2^2}{1 - \phi_2 - \phi_1 \phi_3 - \phi_3^2} \\
+\rho_3 &= \frac{\phi_3 + \phi_1^3 + \phi_1^2 \phi_3 + \phi_1 \phi_2^2 + 2 \phi_1 \phi_2 + \phi_2^2 \phi_3 - \phi_2 \phi_3 - \phi_1 \phi_3^2 - \phi_3^3}{1 - \phi_2 - \phi_1 \phi_3 - \phi_3^2}.
+\end{aligned}
+\]
+
+Enfin, la variance inconditionnelle peut être calculée en utilisant les
+trois premières autocorrélations, \[
+\begin{aligned}
+\gamma_0 &= \phi_1 \gamma_1 + \phi_2 \gamma_2 + \phi_3 \gamma_3 + \sigma^2 \\
+\gamma_0 - \phi_1 \gamma_1 - \phi_2 \gamma_2 - \phi_3 \gamma_3 &= \sigma^2 \\
+\gamma_0 (1 - \phi_1 \rho_1 - \phi_2 \rho_2 - \phi_3 \rho_3) &= \sigma^2 \\
+\gamma_0 &= \frac{\sigma^2}{1 - \phi_1 \rho_1 - \phi_2 \rho_2 - \phi_3 \rho_3} \\
+\gamma_0 &= \frac{\sigma^2 (1 - \phi_2 - \phi_1 \phi_3 - \phi_3^2)}{(1 - \phi_2 - \phi_3 - \phi_1)(1 + \phi_2 + \phi_3 \phi_1 - \phi_3^2)(1 + \phi_3 + \phi_1 - \phi_2)}.
+\end{aligned}
+\]
+
+\subsubsection{A.1.6 ARMA(1,1)}\label{a.1.6-arma11}
+
+Le calcul des autocovariances et autocorrélations d'un processus ARMA
+est plus complexe que pour un processus AR ou MA pur. Un ARMA(1,1) est
+spécifié comme suit : \[
+Y_t = \phi_1 Y_{t-1} + \theta_1 \varepsilon_{t-1} + \varepsilon_t
+\] Puisque ( P = Q = 1 ), le système de Yule-Walker nécessite deux
+équations, en notant que l'autocovariance d'ordre 3 ou plus est une
+fonction triviale des deux premières autocovariances.
+
+\[
+\begin{aligned}
+\mathbb{E}[Y_t Y_t] &= \mathbb{E}[\phi_1 Y_{t-1} Y_t] + \mathbb{E}[\theta_1 \varepsilon_{t-1} Y_t] + \mathbb{E}[\varepsilon_t Y_t] \\
+\mathbb{E}[Y_t Y_{t-1}] &= \mathbb{E}[\phi_1 Y_{t-1} Y_{t-1}] + \mathbb{E}[\theta_1 \varepsilon_{t-1} Y_{t-1}] + \mathbb{E}[\varepsilon_t Y_{t-1}]
+\end{aligned}
+\]
+
+La présence du terme ( \mathbb{E}{[}\theta\emph{1 \varepsilon}\{t-1\}
+Y\_t{]} ) dans la première équation complique la résolution du système,
+car ( \varepsilon\emph{\{t-1\} ) apparaît directement dans ( Y\_t ) via
+( \theta\emph{1 \varepsilon}\{t-1\} ) et indirectement via ( \phi\emph{1
+Y}\{t-1\} ). Les relations non nulles peuvent être déterminées en
+substituant récursivement ( Y\_t ) jusqu'à ce qu'il ne consiste qu'en (
+\varepsilon\emph{t ), ( \varepsilon}\{t-1\} ) et ( Y}\{t-2\} ) (puisque
+( Y\_\{t-2\} ) est non corrélé avec ( \varepsilon\_\{t-1\} ) par
+l'hypothèse de bruit blanc).
+
+\[
+\begin{aligned}
+Y_t &= \phi_1 Y_{t-1} + \theta_1 \varepsilon_{t-1} + \varepsilon_t \\
+&= \phi_1 (\phi_1 Y_{t-2} + \theta_1 \varepsilon_{t-2} + \varepsilon_{t-1}) + \theta_1 \varepsilon_{t-1} + \varepsilon_t \\
+&= \phi_1^2 Y_{t-2} + \phi_1 \theta_1 \varepsilon_{t-2} + \phi_1 \varepsilon_{t-1} + \theta_1 \varepsilon_{t-1} + \varepsilon_t \\
+&= \phi_1^2 Y_{t-2} + \phi_1 \theta_1 \varepsilon_{t-2} + (\phi_1 + \theta_1) \varepsilon_{t-1} + \varepsilon_t
+\end{aligned}
+\]
+
+Ainsi, ( \mathbb{E}{[}\theta\emph{1 \varepsilon}\{t-1\} Y\_t{]} =
+\theta\_1 (\phi\_1 + \theta\_1) \sigma\^{}2 ), et les équations de
+Yule-Walker peuvent être exprimées en utilisant les moments
+populationnels et les paramètres du modèle.
+
+\[
+\begin{aligned}
+\gamma_0 &= \phi_1 \gamma_1 + \theta_1 (\phi_1 + \theta_1) \sigma^2 + \sigma^2 \\
+\gamma_1 &= \phi_1 \gamma_0 + \theta_1 \sigma^2
+\end{aligned}
+\]
+
+Ces deux équations à deux inconnues peuvent être résolues :
+
+\[
+\begin{aligned}
+\gamma_0 &= \phi_1 \gamma_1 + \theta_1 (\phi_1 + \theta_1) \sigma^2 + \sigma^2 \\
+&= \phi_1 (\phi_1 \gamma_0 + \theta_1 \sigma^2) + \theta_1 (\phi_1 + \theta_1) \sigma^2 + \sigma^2 \\
+&= \phi_1^2 \gamma_0 + \phi_1 \theta_1 \sigma^2 + \theta_1 (\phi_1 + \theta_1) \sigma^2 + \sigma^2 \\
+\gamma_0 - \phi_1^2 \gamma_0 &= \sigma^2 (\phi_1 \theta_1 + \phi_1 \theta_1 + \theta_1^2 + 1) \\
+\gamma_0 &= \frac{\sigma^2 (1 + \theta_1^2 + 2 \phi_1 \theta_1)}{1 - \phi_1^2}
+\end{aligned}
+\]
+
+De même, pour ( \gamma\_1 ) :
+
+\[
+\begin{aligned}
+\gamma_1 &= \phi_1 \gamma_0 + \theta_1 \sigma^2 \\
+&= \phi_1 \left( \frac{\sigma^2 (1 + \theta_1^2 + 2 \phi_1 \theta_1)}{1 - \phi_1^2} \right) + \theta_1 \sigma^2 \\
+&= \frac{\sigma^2 (\phi_1 + \phi_1 \theta_1^2 + 2 \phi_1^2 \theta_1)}{1 - \phi_1^2} + \theta_1 \sigma^2 \\
+&= \frac{\sigma^2 (\phi_1 + \phi_1 \theta_1^2 + 2 \phi_1^2 \theta_1) + \theta_1 \sigma^2 (1 - \phi_1^2)}{1 - \phi_1^2} \\
+&= \frac{\sigma^2 (\phi_1 + \phi_1 \theta_1^2 + 2 \phi_1^2 \theta_1 + \theta_1 - \phi_1^2 \theta_1)}{1 - \phi_1^2} \\
+&= \frac{\sigma^2 (\phi_1 + \theta_1 + \phi_1 \theta_1^2 + \phi_1^2 \theta_1)}{1 - \phi_1^2} \\
+&= \frac{\sigma^2 (\phi_1 + \theta_1)(1 + \phi_1 \theta_1)}{1 - \phi_1^2} \\
+\end{aligned}
+\] Ainsi, la première autocorrélation est :
+
+\[
+\rho_1 = \frac{\gamma_1}{\gamma_0} = \frac{\frac{\sigma^2 (\phi_1 + \theta_1)(1 + \phi_1 \theta_1)}{1 - \phi_1^2}}{\frac{\sigma^2 (1 + \theta_1^2 + 2 \phi_1 \theta_1)}{1 - \phi_1^2}} = \frac{(\phi_1 + \theta_1)(1 + \phi_1 \theta_1)}{1 + \theta_1^2 + 2 \phi_1 \theta_1}
+\]
+
+En revenant à l'équation suivante de Yule-Walker :
+
+\[
+\mathbb{E}[Y_t Y_{t-2}] = \mathbb{E}[\phi_1 Y_{t-1} Y_{t-2}] + \mathbb{E}[\theta_1 \varepsilon_{t-1} Y_{t-2}] + \mathbb{E}[\varepsilon_t Y_{t-2}]
+\]
+
+Ainsi, ( \gamma\_2 = \phi\_1 \gamma\_1 ), et en divisant les deux côtés
+par ( \gamma\_0 ), on obtient ( \rho\_2 = \phi\_1 \rho\_1 ). Les
+autocovariances et autocorrélations d'ordre supérieur suivent
+respectivement ( \gamma\_s = \phi\emph{1 \gamma}\{s-1\} ) et ( \rho\_s =
+\phi\emph{1 \rho}\{s-1\} ), et donc ( \rho\_s = \phi\_1\^{}\{s-1\}
+\rho\_1 ) pour ( s \geq 2 ).
+
+\subsection{A.2 Substitution
+rétroactive}\label{a.2-substitution-ruxe9troactive}
+
+La substitution rétroactive est une méthode directe mais fastidieuse
+pour dériver la fonction d'autocorrélation (ACF) et la variance à long
+terme.
+
+\subsubsection{A.2.1 AR(1)}\label{a.2.1-ar1}
+
+Le processus AR(1), \[
+Y_t = \phi_1 Y_{t-1} + \varepsilon_t,
+\] est stationnaire si (\textbar{}\phi\_1\textbar{} \textless{} 1) et si
+(\{\varepsilon\_t\}) est un bruit blanc. Pour calculer les
+autocovariances et autocorrélations en utilisant la substitution
+rétroactive, on transforme (Y\_t = \phi\emph{1 Y}\{t-1\} +
+\varepsilon\_t) en un processus MA pur par substitution récursive :
+
+\[
+\begin{aligned}
+Y_t &= \phi_1 Y_{t-1} + \varepsilon_t  \\
+&= \phi_1 (\phi_1 Y_{t-2} + \varepsilon_{t-1}) + \varepsilon_t \\
+&= \phi_1^2 Y_{t-2} + \phi_1 \varepsilon_{t-1} + \varepsilon_t \\
+&= \phi_1^2 (\phi_1 Y_{t-3} + \varepsilon_{t-2}) + \phi_1 \varepsilon_{t-1} + \varepsilon_t \\
+&= \phi_1^3 Y_{t-3} + \phi_1^2 \varepsilon_{t-2} + \phi_1 \varepsilon_{t-1} + \varepsilon_t \\
+&= \varepsilon_t + \phi_1 \varepsilon_{t-1} + \phi_1^2 \varepsilon_{t-2} + \phi_1^3 \varepsilon_{t-3} + \dots \\
+Y_t &= \sum_{i=0}^{\infty} \phi_1^i \varepsilon_{t-i}.
+\end{aligned}
+\]
+
+La variance est l'espérance du carré : \[
+\begin{aligned}
+\gamma_0 &= \text{Var}[Y_t] = \mathbb{E}[Y_t^2]  \\
+&= \mathbb{E}\left[\left(\sum_{i=0}^{\infty} \phi_1^i \varepsilon_{t-i}\right)^2\right] \\
+&= \mathbb{E}\left[(\varepsilon_t + \phi_1 \varepsilon_{t-1} + \phi_1^2 \varepsilon_{t-2} + \phi_1^3 \varepsilon_{t-3} + \dots)^2\right] \\
+&= \mathbb{E}\left[\sum_{i=0}^{\infty} \phi_1^{2i} \varepsilon_{t-i}^2 + \sum_{i=0}^{\infty} \sum_{j=0, j \neq i}^{\infty} \phi_1^i \phi_1^j \varepsilon_{t-i} \varepsilon_{t-j}\right] \\
+&= \sum_{i=0}^{\infty} \phi_1^{2i} \mathbb{E}[\varepsilon_{t-i}^2] + \sum_{i=0}^{\infty} \sum_{j=0, j \neq i}^{\infty} \phi_1^i \phi_1^j \mathbb{E}[\varepsilon_{t-i} \varepsilon_{t-j}] \\
+&= \sum_{i=0}^{\infty} \phi_1^{2i} \sigma^2 + \sum_{i=0}^{\infty} \sum_{j=0, j \neq i}^{\infty} \phi_1^i \phi_1^j \cdot 0 \\
+&= \sum_{i=0}^{\infty} \phi_1^{2i} \sigma^2 \\
+&= \frac{\sigma^2}{1 - \phi_1^2}.
+\end{aligned}
+\]
+
+L'étape difficile dans la dérivation est la séparation des
+(\varepsilon\emph{\{t-i\}) en ceux qui sont appariés à leur propre
+retard ((\varepsilon}\{t-i\}\^{}2)) et ceux qui ne le sont pas
+((\varepsilon\emph{\{t-i\} \varepsilon}\{t-j\}, i \neq j)). Le reste de
+la dérivation découle de l'hypothèse que (\{\varepsilon\emph{t\}) est un
+bruit blanc, donc (\mathbb{E}{[}\varepsilon\_\{t-i\}\^{}2{]} =
+\sigma\^{}2) et (\mathbb{E}{[}\varepsilon\emph{\{t-i\}
+\varepsilon}\{t-j\}{]} = 0) pour (i \neq j). Enfin, l'identité (\lim}\{n
+\to \infty\} \sum\_\{i=0\}\^{}n \phi\_1\^{}\{2i\} =
+\frac{1}{1 - \phi_1^2}) pour (\textbar{}\phi\_1\textbar{} \textless{} 1)
+a été utilisée pour simplifier l'expression.
+
+La première autocovariance peut être calculée en utilisant les mêmes
+étapes sur la représentation MA((\infty)) : \[
+\begin{aligned}
+\gamma_1 &= \mathbb{E}[Y_t Y_{t-1}]  \\
+&= \mathbb{E}\left[\sum_{i=0}^{\infty} \phi_1^i \varepsilon_{t-i} \sum_{j=1}^{\infty} \phi_1^{j-1} \varepsilon_{t-j}\right] \\
+&= \mathbb{E}\left[(\varepsilon_t + \phi_1 \varepsilon_{t-1} + \phi_1^2 \varepsilon_{t-2} + \dots)(\varepsilon_{t-1} + \phi_1 \varepsilon_{t-2} + \phi_1^2 \varepsilon_{t-3} + \dots)\right] \\
+&= \mathbb{E}\left[\phi_1 \sum_{i=0}^{\infty} \phi_1^{2i} \varepsilon_{t-1-i}^2 + \sum_{i=0}^{\infty} \sum_{j=1, j \neq i}^{\infty} \phi_1^i \phi_1^{j-1} \varepsilon_{t-i} \varepsilon_{t-j}\right] \\
+&= \phi_1 \sum_{i=0}^{\infty} \phi_1^{2i} \mathbb{E}[\varepsilon_{t-1-i}^2] + \sum_{i=0}^{\infty} \sum_{j=1, j \neq i}^{\infty} \phi_1^i \phi_1^{j-1} \mathbb{E}[\varepsilon_{t-i} \varepsilon_{t-j}] \\
+&= \phi_1 \sum_{i=0}^{\infty} \phi_1^{2i} \sigma^2 + \sum_{i=0}^{\infty} \sum_{j=1, j \neq i}^{\infty} \phi_1^i \phi_1^{j-1} \cdot 0 \\
+&= \phi_1 \sum_{i=0}^{\infty} \phi_1^{2i} \sigma^2 \\
+&= \phi_1 \gamma_0.
+\end{aligned}
+\]
+
+De même, l'autocovariance d'ordre (s) peut être déterminée : \[
+\begin{aligned}
+\gamma_s &= \mathbb{E}[Y_t Y_{t-s}]  \\
+&= \mathbb{E}\left[\sum_{i=0}^{\infty} \phi_1^i \varepsilon_{t-i} \sum_{j=s}^{\infty} \phi_1^{j-s} \varepsilon_{t-j}\right] \\
+&= \mathbb{E}\left[\phi_1^s \sum_{i=0}^{\infty} \phi_1^{2i} \varepsilon_{t-s-i}^2 + \sum_{i=0}^{\infty} \sum_{j=s, j \neq i}^{\infty} \phi_1^i \phi_1^{j-s} \varepsilon_{t-i} \varepsilon_{t-j}\right] \\
+&= \phi_1^s \sum_{i=0}^{\infty} \phi_1^{2i} \mathbb{E}[\varepsilon_{t-s-i}^2] + \sum_{i=0}^{\infty} \sum_{j=s, j \neq i}^{\infty} \phi_1^i \phi_1^{j-s} \mathbb{E}[\varepsilon_{t-i} \varepsilon_{t-j}] \\
+&= \phi_1^s \sum_{i=0}^{\infty} \phi_1^{2i} \sigma^2 + \sum_{i=0}^{\infty} \sum_{j=s, j \neq i}^{\infty} \phi_1^i \phi_1^{j-s} \cdot 0 \\
+&= \phi_1^s \sum_{i=0}^{\infty} \phi_1^{2i} \sigma^2 \\
+&= \phi_1^s \gamma_0.
+\end{aligned}
+\]
+
+Enfin, les autocorrélations peuvent être calculées à partir des ratios
+des autocovariances : \[
+\rho_1 = \frac{\gamma_1}{\gamma_0} = \phi_1 \quad \text{et} \quad \rho_s = \frac{\gamma_s}{\gamma_0} = \phi_1^s.
+\]
+
+\subsubsection{A.2.2 MA(1)}\label{a.2.2-ma1}
+
+Le modèle MA(1) est le modèle de série temporelle non dégénéré le plus
+simple considéré dans ce cours : {[} Y\_t = \theta\emph{1
+\varepsilon}\{t-1\} + \varepsilon\_t. {]}
+
+La dérivation de sa fonction d'autocorrélation est triviale, car aucune
+substitution rétroactive n'est nécessaire. La variance est donnée par :
+{[}
+
+\begin{aligned}
+\gamma_0 &= \text{Var}[Y_t] = \mathbb{E}[Y_t^2]  \\
+&= \mathbb{E}[(\theta_1 \varepsilon_{t-1} + \varepsilon_t)^2] \\
+&= \mathbb{E}[\theta_1^2 \varepsilon_{t-1}^2 + 2 \theta_1 \varepsilon_t \varepsilon_{t-1} + \varepsilon_t^2] \\
+&= \mathbb{E}[\theta_1^2 \varepsilon_{t-1}^2] + \mathbb{E}[2 \theta_1 \varepsilon_t \varepsilon_{t-1}] + \mathbb{E}[\varepsilon_t^2] \\
+&= \theta_1^2 \sigma^2 + 0 + \sigma^2 \\
+&= \sigma^2 (1 + \theta_1^2).
+\end{aligned}
+
+{]}
+
+La première autocovariance est : {[}
+
+\begin{aligned}
+\gamma_1 &= \mathbb{E}[Y_t Y_{t-1}]  \\
+&= \mathbb{E}[(\theta_1 \varepsilon_{t-1} + \varepsilon_t)(\theta_1 \varepsilon_{t-2} + \varepsilon_{t-1})] \\
+&= \mathbb{E}[\theta_1^2 \varepsilon_{t-1} \varepsilon_{t-2} + \theta_1 \varepsilon_{t-1}^2 + \theta_1 \varepsilon_t \varepsilon_{t-2} + \varepsilon_t \varepsilon_{t-1}] \\
+&= \mathbb{E}[\theta_1^2 \varepsilon_{t-1} \varepsilon_{t-2}] + \mathbb{E}[\theta_1 \varepsilon_{t-1}^2] + \mathbb{E}[\theta_1 \varepsilon_t \varepsilon_{t-2}] + \mathbb{E}[\varepsilon_t \varepsilon_{t-1}] \\
+&= 0 + \theta_1 \sigma^2 + 0 + 0 \\
+&= \theta_1 \sigma^2.
+\end{aligned}
+
+{]}
+
+La deuxième autocovariance (et les autocovariances d'ordre supérieur)
+est : {[}
+
+\begin{aligned}
+\gamma_2 &= \mathbb{E}[Y_t Y_{t-2}]  \\
+&= \mathbb{E}[(\theta_1 \varepsilon_{t-1} + \varepsilon_t)(\theta_1 \varepsilon_{t-3} + \varepsilon_{t-2})] \\
+&= \mathbb{E}[\theta_1^2 \varepsilon_{t-1} \varepsilon_{t-3} + \theta_1 \varepsilon_{t-1} \varepsilon_{t-2} + \theta_1 \varepsilon_t \varepsilon_{t-3} + \varepsilon_t \varepsilon_{t-2}] \\
+&= \mathbb{E}[\theta_1^2 \varepsilon_{t-1} \varepsilon_{t-3}] + \mathbb{E}[\theta_1 \varepsilon_{t-1} \varepsilon_{t-2}] + \mathbb{E}[\theta_1 \varepsilon_t \varepsilon_{t-3}] + \mathbb{E}[\varepsilon_t \varepsilon_{t-2}] \\
+&= 0 + 0 + 0 + 0 \\
+&= 0.
+\end{aligned}
+
+{]}
+
+Les autocorrélations sont donc : {[} \rho\_1 =
+\frac{\theta_1}{1 + \theta_1^2}, \quad \rho\_s = 0 \quad \text{pour}
+\quad s \geq 2. {]}
+
+\subsubsection{A.2.3 ARMA(1,1)}\label{a.2.3-arma11}
+
+Un processus ARMA(1,1) est défini par : {[} Y\_t = \phi\emph{1 Y}\{t-1\}
++ \theta\emph{1 \varepsilon}\{t-1\} + \varepsilon\_t. {]} Il est
+stationnaire si (\textbar{}\phi\_1\textbar{} \textless{} 1) et si
+(\{\varepsilon\_t\}) est un bruit blanc. La dérivation de la variance et
+des autocovariances est plus complexe que pour un processus AR(1). Il
+est à noter que cette dérivation est plus longue et plus complexe que la
+résolution des équations de Yule-Walker.
+
+\subsubsection{\texorpdfstring{Représentation
+MA((\infty))}{Représentation MA(())}}\label{repruxe9sentation-ma}
+
+On commence par calculer la représentation MA((\infty)) en utilisant la
+substitution rétroactive : {[}
+
+\begin{aligned}
+Y_t &= \phi_1 Y_{t-1} + \theta_1 \varepsilon_{t-1} + \varepsilon_t \\
+&= \phi_1 (\phi_1 Y_{t-2} + \theta_1 \varepsilon_{t-2} + \varepsilon_{t-1}) + \theta_1 \varepsilon_{t-1} + \varepsilon_t \\
+&= \phi_1^2 Y_{t-2} + \phi_1 \theta_1 \varepsilon_{t-2} + \phi_1 \varepsilon_{t-1} + \theta_1 \varepsilon_{t-1} + \varepsilon_t \\
+&= \phi_1^2 (\phi_1 Y_{t-3} + \theta_1 \varepsilon_{t-3} + \varepsilon_{t-2}) + \phi_1 \theta_1 \varepsilon_{t-2} + (\phi_1 + \theta_1) \varepsilon_{t-1} + \varepsilon_t \\
+&= \phi_1^3 Y_{t-3} + \phi_1^2 \theta_1 \varepsilon_{t-3} + \phi_1^2 \varepsilon_{t-2} + \phi_1 \theta_1 \varepsilon_{t-2} + (\phi_1 + \theta_1) \varepsilon_{t-1} + \varepsilon_t \\
+&= \phi_1^3 (\phi_1 Y_{t-4} + \theta_1 \varepsilon_{t-4} + \varepsilon_{t-3}) + \phi_1^2 \theta_1 \varepsilon_{t-3} + \phi_1 (\phi_1 + \theta_1) \varepsilon_{t-2} + (\phi_1 + \theta_1) \varepsilon_{t-1} + \varepsilon_t \\
+&= \phi_1^4 Y_{t-4} + \phi_1^3 \theta_1 \varepsilon_{t-4} + \phi_1^3 \varepsilon_{t-3} + \phi_1^2 \theta_1 \varepsilon_{t-3} + \phi_1 (\phi_1 + \theta_1) \varepsilon_{t-2} + (\phi_1 + \theta_1) \varepsilon_{t-1} + \varepsilon_t \\
+&= \phi_1^4 Y_{t-4} + \phi_1^3 \theta_1 \varepsilon_{t-4} + \phi_1^2 (\phi_1 + \theta_1) \varepsilon_{t-3} + \phi_1 (\phi_1 + \theta_1) \varepsilon_{t-2} + (\phi_1 + \theta_1) \varepsilon_{t-1} + \varepsilon_t \\
+&= \varepsilon_t + (\phi_1 + \theta_1) \varepsilon_{t-1} + \phi_1 (\phi_1 + \theta_1) \varepsilon_{t-2} + \phi_1^2 (\phi_1 + \theta_1) \varepsilon_{t-3} + \dots \\
+&= \varepsilon_t + \sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-1-i}. 
+\end{aligned}
+
+{]}
+
+\subsubsection{\texorpdfstring{Variance
+((\gamma\_0))}{Variance ((\_0))}}\label{variance-_0}
+
+La variance est donnée par : {[}
+
+\begin{aligned}
+\gamma_0 &= \text{Var}[Y_t] = \mathbb{E}[Y_t^2] \\
+&= \mathbb{E}\left[\left(\varepsilon_t + \sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-1-i}\right)^2\right] \\
+&= \mathbb{E}\left[\varepsilon_t^2 + 2 \varepsilon_t \sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-1-i} + \left(\sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-1-i}\right)^2\right] \\
+&= \mathbb{E}[\varepsilon_t^2] + \mathbb{E}\left[2 \varepsilon_t \sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-1-i}\right] + \mathbb{E}\left[\left(\sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-1-i}\right)^2\right] \\
+&= \sigma^2 + 0 + \mathbb{E}\left[\sum_{i=0}^{\infty} \phi_1^{2i} (\phi_1 + \theta_1)^2 \varepsilon_{t-1-i}^2 + \sum_{i=0}^{\infty} \sum_{j=0, j \neq i}^{\infty} \phi_1^i \phi_1^j (\phi_1 + \theta_1)^2 \varepsilon_{t-1-i} \varepsilon_{t-1-j}\right] \\
+&= \sigma^2 + \sum_{i=0}^{\infty} \phi_1^{2i} (\phi_1 + \theta_1)^2 \sigma^2 + \sum_{i=0}^{\infty} \sum_{j=0, j \neq i}^{\infty} \phi_1^i \phi_1^j (\phi_1 + \theta_1)^2 \cdot 0 \\
+&= \sigma^2 + (\phi_1 + \theta_1)^2 \sigma^2 \sum_{i=0}^{\infty} \phi_1^{2i} \\
+&= \sigma^2 + (\phi_1 + \theta_1)^2 \sigma^2 \frac{1}{1 - \phi_1^2} \\
+&= \sigma^2 \left(1 + \frac{(\phi_1 + \theta_1)^2}{1 - \phi_1^2}\right) \\
+&= \sigma^2 \frac{1 - \phi_1^2 + (\phi_1 + \theta_1)^2}{1 - \phi_1^2} \\
+&= \sigma^2 \frac{1 + \theta_1^2 + 2 \phi_1 \theta_1}{1 - \phi_1^2}.
+\end{aligned}
+
+{]}
+
+\subsubsection{\texorpdfstring{Autocovariance d'ordre 1
+((\gamma\_1))}{Autocovariance d'ordre 1 ((\_1))}}\label{autocovariance-dordre-1-_1}
+
+L'autocovariance d'ordre 1 est donnée par : {[}
+
+\begin{aligned}
+\gamma_1 &= \mathbb{E}[Y_t Y_{t-1}] \\
+&= \mathbb{E}\left[\left(\varepsilon_t + \sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-1-i}\right) \left(\varepsilon_{t-1} + \sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-2-i}\right)\right] \\
+&= \mathbb{E}\left[\varepsilon_t \varepsilon_{t-1} + \sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_t \varepsilon_{t-2-i} + \sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-1} \varepsilon_{t-1-i} \right. \\
+&\quad \left. + \left(\sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-1-i}\right) \left(\sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-2-i}\right)\right] \\
+&= 0 + 0 + (\phi_1 + \theta_1) \sigma^2 + \mathbb{E}\left[\sum_{i=0}^{\infty} \phi_1^{2i+1} (\phi_1 + \theta_1)^2 \varepsilon_{t-2-i}^2 + \sum_{i=0}^{\infty} \sum_{j=0, j \neq i+1}^{\infty} \phi_1^i \phi_1^j (\phi_1 + \theta_1)^2 \varepsilon_{t-1-i} \varepsilon_{t-2-j}\right] \\
+&= (\phi_1 + \theta_1) \sigma^2 + \phi_1 (\phi_1 + \theta_1)^2 \sigma^2 \sum_{i=0}^{\infty} \phi_1^{2i} \\
+&= (\phi_1 + \theta_1) \sigma^2 + \phi_1 (\phi_1 + \theta_1)^2 \sigma^2 \frac{1}{1 - \phi_1^2} \\
+&= \sigma^2 \left((\phi_1 + \theta_1) + \frac{\phi_1 (\phi_1 + \theta_1)^2}{1 - \phi_1^2}\right) \\
+&= \sigma^2 \frac{(\phi_1 + \theta_1)(1 - \phi_1^2) + \phi_1 (\phi_1 + \theta_1)^2}{1 - \phi_1^2} \\
+&= \sigma^2 \frac{(\phi_1 + \theta_1)(1 + \phi_1 \theta_1)}{1 - \phi_1^2}.
+\end{aligned}
+
+{]}
+
+\subsubsection{Autocorrélations}\label{autocorruxe9lations}
+
+L'autocorrélation d'ordre 1 est : {[} \rho\_1 =
+\frac{\gamma_1}{\gamma_0} =
+\frac{(\phi_1 + \theta_1)(1 + \phi_1 \theta_1)}{1 + \theta_1^2 + 2 \phi_1 \theta_1}.
+{]}
+
+Les autocorrélations d'ordre supérieur suivent la récurrence : {[}
+\rho\_s = \phi\emph{1 \rho}\{s-1\}, \quad s \geq 2. {]}
+
+
+
+
+\end{document}
