@@ -14,38 +14,18 @@ créneau.*
 **Langage.** `R` ou `Python`, au choix. Les fonctions équivalentes sont dans
 `03-TP/correspondance-R-python.md`.
 
-**Données.** Deux séries trimestrielles américaines, 1980-2019 :
+**Données.** Deux séries trimestrielles américaines, en cache local — aucune
+clé ni connexion n'est nécessaire :
 
-| Variable | Série FRED | Description |
+| Variable | Fichier | Description |
 |---|---|---|
-| $y_1$ | `GDPC1` | PIB réel |
-| $y_2$ | `UNRATE` | Taux de chômage |
+| $y_1$ | `04-Data/FRED_GDPC1.csv` | PIB réel |
+| $y_2$ | `04-Data/FRED_UNRATE.csv` | Taux de chômage |
 
-L'accès à FRED demande une clé personnelle gratuite
-([obtention](https://fred.stlouisfed.org/docs/api/api_key.html)). **Stockez-la
-dans une variable d'environnement**, jamais dans le code :
+Le chômage est mensuel, le PIB trimestriel : il faudra les aligner.
 
-::: {.panel-tabset}
-
-### `R`
-
-```r
-# une fois pour toutes, dans ~/.Renviron :  FRED_API_KEY=votre_cle
-fredr::fredr_set_key(Sys.getenv("FRED_API_KEY"))
-```
-
-### `Python`
-
-```python
-import os
-os.environ["FRED_API_KEY"] = "..."   # ou via un fichier .env
-```
-
-:::
-
-> **Sans connexion ou sans clé**, travaillez sur les deux séries d'insolation
-> annuelles de `04-Data/SH_IN_metropole/` (Nice et Paris). Toutes les questions
-> restent valables, seule l'interprétation économique change.
+> Si un fichier manque, lancez une fois depuis la racine du dépôt :
+> `source("04-Data/mettre-a-jour-donnees-externes.R")`
 
 ---
 

@@ -1,0 +1,103 @@
+---
+title: "Économétrie des Séries Temporelles"
+author: "Fiche TP #1"
+date: "Bruit blanc, simulation, ACF et PACF"
+format: pdf
+---
+
+*Séance 4. Prépare la partie 1 du projet et le TP noté n°1.*
+
+# Avant de commencer
+
+**Langage.** `R` ou `Python`, au choix. Les fonctions équivalentes sont dans
+`03-TP/correspondance-R-python.md`. Les corrigés existent dans les deux
+langages, déposés après la séance.
+
+**Données.** Durées d'insolation mensuelles de Nice et de Paris, Météo-France.
+Chargement direct par URL, sans clone préalable :
+
+| Ville | Fichier |
+|---|---|
+| Nice | `04-Data/SH_MIN006088001.csv` |
+| Paris | `04-Data/SH_MIN175114001.csv` |
+
+```
+https://raw.githubusercontent.com/bilelsanhaji/Cours-Series-Temporelles/refs/heads/main/04-Data/
+```
+
+Le séparateur est `;`, les lignes d'en-tête commencent par `#`, la colonne de
+date est au format `AAAAMM` et la valeur est dans la colonne `VALEUR`.
+
+---
+
+# Exercice 1 — Prendre les données en main
+
+  (a) Chargez les deux séries. Combien d'observations ? Sur quelle période ?
+  (b) Représentez-les graphiquement, chacune avec sa moyenne en trait
+      horizontal.
+  (c) Décrivez ce que vous voyez. Quelle caractéristique domine, et
+      pourquoi n'est-elle pas surprenante pour cette variable ?
+  (d) Superposez les deux séries sur un même graphique. Que remarquez-vous ?
+
+---
+
+# Exercice 2 — À quoi ressemble le hasard
+
+Simulez 51 observations indépendantes tirées de chacune des lois suivantes :
+
+  (a) $\mathcal{N}(0,1)$
+  (b) $\chi^2_2$
+  (c) $t_5$
+  (d) une loi uniforme sur $[-1, 1]$
+
+Pour chacune :
+
+  1. tracez la série temporelle ;
+  2. répondez : cela « a-t-il l'air aléatoire » ?
+  3. **recommencez trois fois avec une nouvelle simulation.** Vos réponses
+     changent-elles ?
+
+**Ce que l'exercice cherche à montrer.** Sur 51 observations, l'œil voit des
+tendances et des cycles là où il n'y en a aucun. C'est précisément pourquoi on
+a besoin de tests, et pourquoi « ça a l'air stationnaire » n'est pas un
+argument.
+
+---
+
+# Exercice 3 — Ces quatre séries sont-elles des bruits blancs ?
+
+Les quatre lois de l'exercice 2 produisent des séries $\mathsf{iid}$. Toutes
+sont donc des bruits blancs — en théorie.
+
+  (a) Pour chaque série, tracez l'ACF. Combien de barres sortent de
+      l'intervalle de confiance ?
+  (b) Sur 20 retards, au seuil de 5 %, combien de dépassements attendez-vous
+      **même si la série est un vrai bruit blanc** ? Comparez.
+  (c) Appliquez un test de Ljung-Box à chaque série. Précisez l'hypothèse
+      nulle et le nombre de retards retenu.
+  (d) Simulez 1000 bruits blancs de taille 51 et comptez la proportion de
+      rejets au seuil de 5 %. Que devriez-vous trouver ? Trouvez-vous cela ?
+
+---
+
+# Exercice 4 — Reconnaître une structure
+
+  (a) Simulez un AR(1) de coefficient $0{,}7$, puis un MA(1) de coefficient
+      $0{,}7$, sur 300 observations.
+  (b) Tracez l'ACF et la PACF de chacun.
+  (c) **Sans regarder vos paramètres**, dites lequel est lequel à partir des
+      seuls corrélogrammes. Sur quel critère ?
+  (d) Recommencez avec 50 observations. La lecture est-elle toujours aussi
+      nette ? Qu'est-ce que cela implique pour un travail sur données réelles
+      courtes ?
+
+---
+
+# Exercice 5 — Retour aux données réelles
+
+  (a) Tracez l'ACF et la PACF de la série de Nice.
+  (b) La structure que vous observez relève-t-elle d'un ARMA ? Sinon, de quoi
+      s'agit-il ?
+  (c) Construisez la série des **cumuls annuels** (somme des douze mois). Tracez son ACF.
+  (d) Comparez les deux corrélogrammes. Qu'a fait l'agrégation annuelle, et
+      pourquoi est-ce la transformation retenue pour les TP notés ?

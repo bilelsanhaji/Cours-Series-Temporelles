@@ -83,7 +83,8 @@ Si $\alpha > 1$, $y_{t}$ est explosif.
 #| label: libs3
 #| echo: false
 library(fredr) #https://fred.stlouisfed.org/docs/api/api_key.html
-fredr_set_key(Sys.getenv("FRED_API_KEY"))
+# Les séries externes sont lues dans 04-Data/ : aucune clé requise ici.
+source("04-Data/charger-externes.R")
 library(astsa)
 library(xts)
 library(quantmod)
@@ -94,12 +95,8 @@ library(aTSA)
 ```
 
 ```{r}
-GBP <- getSymbols(Symbols = 'GBP=X', src = 'yahoo', 
-                  from='2004-12-01', to='2024-12-01', auto.assign = FALSE)
-GBP$Date = as.Date.character(GBP$Date, format = "%Y/%m/%d")
-GBP.date <- GBP$Date 
-GBP.p <- GBP$GBP.X.Close 
-plot(GBP.p, main="GBP=X")
+GBP <- charger_externe("YAHOO_GBPUSD")
+plot(GBP$date, GBP$close, type = "l", main = "GBP=X", xlab = "", ylab = "")
 ```
 
 ------------------------------------------------------------------------

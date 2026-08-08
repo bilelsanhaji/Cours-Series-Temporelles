@@ -41,17 +41,18 @@ knitr::opts_chunk$set(
 ------------------------------------------------------------------------
 
 ## Taux de chômage aux États-Unis
-<!-- fredr_set_key(Sys.getenv("FRED_API_KEY")) -->
+<!-- # Les séries externes sont lues dans 04-Data/ : aucune clé requise ici.
+source("04-Data/charger-externes.R") -->
 ```{r}
 #| echo: false
 library(fredr) #https://fred.stlouisfed.org/docs/api/api_key.html
-fredr_set_key(Sys.getenv("FRED_API_KEY"))
+# Les séries externes sont lues dans 04-Data/ : aucune clé requise ici.
+source("04-Data/charger-externes.R")
 ```
 ```{r}
 #| label: libs
 #| echo: true
 library(fredr) #https://fred.stlouisfed.org/docs/api/api_key.html
-#fredr_set_key("votre clé perso")
 library(tseries)
 library(astsa)
 library(xts)
@@ -66,12 +67,10 @@ library(quantmod)
 #| label: Unrate
 #| fig-width: 10
 #| fig-height: 3.5
-USunrate = fredr(series_id = "UNRATE",
-           observation_start = as.Date("1948-01-01"),
-           observation_end = as.Date("2025-10-01"))
+USunrate <- charger_externe("FRED_UNRATE")
 tsplot(USunrate$date, USunrate$value, 
        ylab="Taux de chomage aux USA", xlab='')
-abline(h = mean(USunrate$value), col = "red", lty = 2, lwd = 2)
+abline(h = mean(USunrate$value, na.rm = TRUE), col = "red", lty = 2, lwd = 2)
 legend("topright", legend = "Moyenne", col = "red", lty = 2, lwd = 2, bty = "n")
 ```
 
@@ -329,13 +328,12 @@ La stationnarité stricte implique que tous les moments sont invariants dans le 
 #| results: 'hide'
 #| fig-width: 10
 #| fig-height: 4.0
-DJI = getSymbols("^DJI", src = "yahoo", from = "2004-01-01", 
-                 to = "2014-01-01", auto.assign = FALSE)
-djia = Cl(DJI)
-djiar = 100 * diff(log(djia))[-1]  # [-1] retire 1 observation
+DJI  <- charger_externe("YAHOO_DJI")
+djia <- DJI$close
+djiar <- 100 * diff(log(djia))   # une observation de moins
 par(mfrow=c(4,1))
-tsplot(index(DJI), djia, main="Indice DJIA", ylab="Indice")
-tsplot(index(DJI)[-1], djiar, main="Rendement DJIA", ylab="Taux de rendement")
+tsplot(DJI$date, djia, main="Indice DJIA", ylab="Indice")
+tsplot(DJI$date[-1], djiar, main="Rendement DJIA", ylab="Taux de rendement")
 acf(djiar, main = '')
 pacf(djiar, main = '')
 ```

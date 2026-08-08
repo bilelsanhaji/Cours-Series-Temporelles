@@ -7,7 +7,7 @@ Les `#` et `##` restent des titres **à l'intérieur** d'une slide.
 
 | Fichier | Chapitre | Slides | Séances |
 |---|---|---|---|
-| `../00-Syllabus/syllabus.qmd` | 0 — Présentation générale | 4 | 1 |
+| `../00-Syllabus/syllabus.qmd` | 0 — Présentation générale | 5 | 1 |
 | `CM1-introduction.qmd` | 1 — Introduction et concepts essentiels | 24 | 1–2 |
 | `CM2-arma.qmd` | 2 — Processus ARMA stationnaires | 36 | 3–5 |
 | `CM3-racines-unitaires.qmd` | 3 — Racines unitaires | 23 | 5–7 |
@@ -16,7 +16,7 @@ Les `#` et `##` restent des titres **à l'intérieur** d'une slide.
 | `CM6-ouverture.qmd` | 6 — Ouverture : modèles non linéaires | 5 | 11 |
 | `CMR-rappels-revisions.qmd` | Rappels et révisions | 10 | 11 |
 
-**154 slides pour 11 × 75 min de cours magistral**, soit environ 5,5 min par
+**155 slides pour 11 × 75 min de cours magistral**, soit environ 5,5 min par
 slide — le rythme observé sur les deux années précédentes.
 
 ## Deux versions : la vôtre et celle des étudiants
@@ -63,32 +63,25 @@ Les slides « Dans la pratique » sont devenues la matière des fiches de TP. Ce
 qui a été retiré est conservé dans `extraits/`, chapitre par chapitre, pour
 servir de matière première.
 
-## Deux façons de rendre
+## Trois rendus, à ne pas confondre
 
-**Pour les étudiants** — un seul fichier HTML, autonome, qui fonctionne hors
-ligne et se dépose tel quel sur Moodle :
+| Pour | Commande | Sort dans | Notes | Publié |
+|---|---|---|---|---|
+| **Les étudiants** | `Version étudiante.command` | `01-Slides/etudiant/` | non | oui |
+| **La salle** | `Tableau - Chapitre 2.command` | `_tableau/01-Slides/` | oui | non |
+| **Votre relecture** | `quarto render 01-Slides/CM2-arma.qmd` | `01-Slides/` | oui | non |
 
-```bash
-quarto render 01-Slides/CM2-arma.qmd
-```
+Les deux derniers rendent **votre source, notes comprises**. Ils sont l'un et
+l'autre exclus du dépôt — le troisième par la règle `01-Slides/*.html` du
+`.gitignore`.
 
-**Pour la salle** — avec le tableau blanc, pour annoter les slides en direct :
-
-```bash
-quarto render 01-Slides/CM2-arma.qmd --profile tableau
-```
-
-Ou, plus simplement, double-cliquer sur le lanceur **`Tableau - Chapitre 2.command`** :
-il rend le deck et l'ouvre dans Safari.
-
-> **Les deux rendus ne se mélangent pas.** La version étudiante sort à côté de
-> la source, `01-Slides/CM2-arma.html`. La version tableau sort dans
-> `_tableau/01-Slides/CM2-arma.html`, un dossier exclu du dépôt. Le plugin
-> chalkboard interdit l'auto-inclusion des ressources : cette version-là traîne
-> un dossier `*_files/` et ne s'ouvrirait pas chez un étudiant.
+> **Les rendus ne se mélangent pas.** La version tableau traîne un dossier
+> `*_files/` : le plugin chalkboard interdit l'auto-inclusion des ressources, et
+> ce fichier-là ne s'ouvrirait pas chez un étudiant.
 >
-> Le script `publier-Cours-Series-Temporelles.command` refuse de committer un
-> HTML non autonome, au cas où l'un des deux se retrouverait au mauvais endroit.
+> Le script `publier-Cours-Series-Temporelles.command` a deux garde-fous : il
+> refuse tout HTML non autonome, et **tout fichier contenant vos notes de
+> conduite de séance**.
 
 ## En présentation
 

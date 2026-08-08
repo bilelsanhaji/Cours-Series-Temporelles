@@ -17,6 +17,10 @@
 
 project:
   title: "Économétrie des séries temporelles — M1 MBFA"
+  # Tous les chunks s'exécutent depuis la racine du dépôt, quel que soit
+  # l'emplacement du document. Un chapitre écrit "04-Data/..." fonctionne donc
+  # aussi bien depuis 01-Slides/ que depuis 01-Slides/etudiant/.
+  execute-dir: project
   render:
     # Vos sources, avec les notes de conduite de séance. Non publiées.
     - "00-Syllabus/*.qmd"

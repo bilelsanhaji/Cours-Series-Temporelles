@@ -1,68 +1,105 @@
 ---
 title: "Économétrie des Séries Temporelles"
-author: "Fiche TD `R` #3"
-date: "Racines unitaires"
+author: "Fiche TP #3"
+date: "Racines unitaires, DS/TS et régression fallacieuse"
 format: pdf
 ---
-```{r}
-#| label: setup
-#| include: false
-knitr::opts_chunk$set(
-  echo = TRUE,
-  error = TRUE,
-  fig.width = 10, 
-  fig.height = 5,
-  dpi = 600,
-  fig.keep ="last",
-  message = FALSE,
-  warning = FALSE,
-  results = "markup"
-)
-```
 
-```{r}
-#| label: bibliotheques
-#| echo: false
-##############
-## Packages ##
-##############
-library(tseries)
-library(quantmod)
-library(ggplot2)
-library(forecast)
-library(astsa)
-library(readr)
-library(TSA)
-```
+*Séance 9, en préparation du TP noté n°2 qui a lieu dans le même créneau.*
 
-### Exercice 1 : Analyse des prix de l'or (2005)
+# Avant de commencer
 
-Récupérez le prix quotidien de l'or (en dollars par once) pour l'année 2005 sur Yahoo Finance (ticker 'GC=F'). Vous commenterez chaque étape et chaque résultat.
+**Langage.** `R` ou `Python`, au choix. Voir `03-TP/correspondance-R-python.md`.
 
-**1. Graphique de la série temporelle des prix de l'or**
+**Données.** Trois sources, toutes en cache local — aucune API n'est nécessaire :
 
-a.  Téléchargez les données quotidiennes de l'or pour l'année 2005.
-b.  Affichez un graphique de la série temporelle des prix de l'or.
-c.  Interprétez le graphique. Quelles tendances ou patterns observez-vous ?
+| Série | Fichier | Usage |
+|---|---|---|
+| Chômage américain, mensuel | `04-Data/FRED_UNRATE.csv` | exercices 1 et 2 |
+| Or, cours quotidien 2005 | `04-Data/YAHOO_GOLD_2005.csv` | exercice 4 |
+| Insolation annuelle, Nice | `04-Data/SH_MIN006088001.csv` | exercice 3 |
 
-**2. Graphique des rendements de l'or**
+> Si un fichier manque, lancez une fois depuis la racine du dépôt :
+> `source("04-Data/mettre-a-jour-donnees-externes.R")`
 
-a.  Calculez les rendements de l'or ainsi $R_t=\log\left(\frac{P_t}{P_{t-1}}\right)\times100$ où $P_t$ est le prix de l'or à la date $t$. Pourquoi utilise-t-on cette transformation ?
-b.  Affichez un graphique de la série temporelle des rendements.
-c.  Interprétez ce graphique. Comment se comporte la série transformée par rapport à la série originale ?
+---
 
-**3. ACF des rendements de l'or**
+# Exercice 1 — Voir avant de tester
 
-a.  Calculez et affichez l'ACF (Autocorrelation Function) échantillonnée pour les rendements de l'or.
-b.  Analysez les caractéristiques de l'ACF. Les autocorrélations sont-elles significatives ? Que suggèrent-elles sur la structure de la série ?
-c.  Discutez si les résultats de l'ACF sont compatibles avec l'hypothèse d'une marche aléatoire. Quelles propriétés de l'ACF soutiennent ou contredisent cette hypothèse ?
+  (a) Représentez le chômage américain, sa différence première et sa
+      différence seconde.
+  (b) Tracez les trois ACF correspondantes.
+  (c) **Avant tout test**, dites laquelle des trois séries vous paraît
+      stationnaire, et sur quels indices.
+  (d) Que se passe-t-il quand on différencie une série déjà stationnaire ?
+      Regardez l'ACF de la différence seconde : que remarquez-vous au retard 1,
+      et pourquoi est-ce le signe d'une sur-différenciation ?
 
-**4. Histogramme des rendements de l'or**
+---
 
-a.  Affichez un histogramme des rendements de l'or.
-b.  Interprétez l'histogramme. Quelle est la distribution des rendements ? Est-elle symétrique ? Y a-t-il des valeurs aberrantes ?
+# Exercice 2 — La procédure de test, pas seulement le test
 
-**5. QQ-plot des rendements de l'or**
+  (a) Appliquez un test ADF au chômage américain. Justifiez le nombre de
+      retards retenu.
+  (b) Comparez deux implémentations : `{tseries}` contre `{urca}` en `R`,
+      `statsmodels.adfuller` contre `arch.unitroot.ADF` en `Python`. Les
+      résultats diffèrent-ils ? **Pourquoi ?**
+  (c) Conduisez la **procédure** complète : par quelle spécification
+      commencez-vous, qu'observez-vous, que faites-vous ensuite. Documentez
+      chaque étape.
+  (d) Reconstruisez la statistique jointe $\phi_3$ à partir de la régression
+      auxiliaire, par un test de Fisher. Comparez-la à celle que donne
+      `urca::ur.df` si vous êtes en `R`.
+  (e) **Pourquoi la valeur critique ne se lit-elle pas dans une table de
+      Fisher ?** Où la trouve-t-on ?
+  (f) Appliquez un test KPSS. Son hypothèse nulle est l'inverse de celle de
+      l'ADF : les deux conclusions sont-elles cohérentes ? Que faire si elles ne
+      le sont pas ?
 
-a.  Affichez un graphique quantile-quantile (QQ-plot) des rendements de l'or par rapport à une distribution normale.
-b.  Interprétez le QQ-plot. Les rendements suivent-elles une distribution normale ? Quels écarts par rapport à la normalité observez-vous ?
+---
+
+# Exercice 3 — DS ou TS ?
+
+Sur la série annuelle d'insolation de Nice :
+
+  (a) Régressez la série sur une constante et une tendance linéaire.
+      Le coefficient de tendance est-il significatif ?
+  (b) Représentez la série, la tendance estimée, puis la série dé-trendée.
+  (c) Testez la stationnarité de la série dé-trendée, puis celle de la série
+      différenciée.
+  (d) **Tranchez** : DS ou TS ? Quelle transformation retenez-vous ?
+  (e) Si la série est DS, que devient l'interprétation du coefficient de
+      tendance estimé en (a) ?
+
+---
+
+# Exercice 4 — Une série financière
+
+Sur le cours quotidien de l'or en 2005 :
+
+  (a) Représentez la série des prix. Commentez.
+  (b) Calculez les rendements $R_t = 100 \times \log(P_t / P_{t-1})$.
+      **Pourquoi cette transformation plutôt qu'une différence simple ?**
+  (c) Représentez les rendements. Qu'est-ce qui change par rapport au niveau ?
+  (d) Tracez l'ACF des rendements. Est-elle compatible avec une marche
+      aléatoire sur les prix ? Quelles propriétés de l'ACF soutiennent ou
+      contredisent cette hypothèse ?
+  (e) Histogramme des rendements superposé à une loi normale ajustée, puis
+      QQ-plot. La distribution est-elle normale ? Où se situent les écarts ?
+  (f) Tracez l'ACF des rendements **au carré**. Comparez à celle de (d).
+      Qu'est-ce que cela révèle, et quel test formaliserait cette observation ?
+
+---
+
+# Exercice 5 — La régression fallacieuse, expérimentalement
+
+  (a) Simulez deux marches aléatoires **indépendantes** de 200 observations.
+      Régressez l'une sur l'autre. Relevez $R^2$ et la statistique de Student.
+  (b) Répétez mille fois. Quelle proportion des cas rejette la nullité de la
+      pente au seuil de 5 % ?
+  (c) Comparez aux 5 % attendus. Commentez.
+  (d) Recommencez avec deux séries **stationnaires** indépendantes. Retrouvez-vous
+      les 5 % ?
+  (e) Reprenez (a) sur les séries **différenciées**. Le problème disparaît-il ?
+  (f) **Ce que vous venez de démontrer.** Formulez en deux phrases la règle
+      pratique qui en découle, telle que vous l'écririez dans un rapport.

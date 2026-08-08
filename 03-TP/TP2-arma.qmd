@@ -1,105 +1,105 @@
 ---
 title: "Économétrie des Séries Temporelles"
-author: "Fiche TD `R` #2"
-date: "Processus ARMA stationnaires"
+author: "Fiche TP #2"
+date: "Processus ARMA — identification, estimation, diagnostic"
 format: pdf
 ---
- 
-```{r}
-#| label: setup
-#| include: false
-knitr::opts_chunk$set(
-  echo = TRUE,
-  error = TRUE,
-  fig.width = 10, 
-  fig.height = 5,
-  dpi = 600,
-  fig.keep ="last",
-  message = FALSE,
-  warning = FALSE,
-  results = "markup"
-)
-```
 
-### Packages
+*Séance 7, en préparation du TP noté n°1 qui a lieu dans le même créneau.
+Cette fiche reprend l'ensemble des mises en œuvre qui figuraient auparavant
+dans le chapitre 2 du cours.*
 
-```{r}
-#| label: bibliotheques
-library(readr)
-library(zoo)
-library(astsa)
-library(forecast)
-library(stats)
-library(tseries)
-library(aTSA)
-#install.packages("aTSA")
-```
+# Avant de commencer
 
-### Données (identiques au TP1)
+**Langage.** `R` ou `Python`, au choix. Voir `03-TP/correspondance-R-python.md`.
 
-Nice : <https://github.com/bilelsanhaji/Cours-Series-Temporelles/blob/main/04-Data/SH_MIN006088001.csv>
+**Données.** Les mêmes qu'au TP1 : insolation mensuelle de Nice et de Paris.
+**Travaillez sur les cumuls annuels** (somme des douze mois de chaque année,
+soit 84 observations de 1931 à 2014) — l'agrégation élimine la saisonnalité, dont le traitement n'est pas l'objet de cette fiche.
 
-Paris : <https://github.com/bilelsanhaji/Cours-Series-Temporelles/blob/main/04-Data/SH_MIN175114001.csv>
+---
 
-```{r}
-#| label: DataImport
-urlSHnice <- "https://raw.githubusercontent.com/bilelsanhaji/Cours-Series-Temporelles/refs/heads/main/04-Data/SH_MIN006088001.csv"
-InsoNice <- read_delim(urlSHnice, 
-                       delim = ";",
-                       escape_double = FALSE,
-                       col_types = cols(YYYYMM = col_date(format = "%Y%m")), 
-                       comment = "#", trim_ws = TRUE)
+# Exercice 1 — Identification
 
-urlSHparis <- "https://raw.githubusercontent.com/bilelsanhaji/Cours-Series-Temporelles/refs/heads/main/04-Data/SH_MIN175114001.csv"
-InsoParis <- read_delim(urlSHparis,
-                        delim = ";",
-                        escape_double = FALSE,
-                        col_types = cols(YYYYMM = col_date(format = "%Y%m")),
-                        comment = "#", trim_ws = TRUE)
-```
+Sur la série annuelle de Nice :
 
-```{r}
-#| label: value
-Nice_ts = ts(InsoNice$VALEUR)
-Paris_ts = ts(InsoParis$VALEUR)
-```
+  (a) Représentez la série. Décrivez-la en trois phrases.
+  (b) Testez la stationnarité. Précisez le test, son hypothèse nulle, et votre
+      conclusion.
+  (c) Tracez l'ACF et la PACF.
+  (d) Proposez **deux** modèles candidats, justifiés par la lecture des
+      corrélogrammes et non par un critère automatique.
 
+---
 
-### Exercice 1
+# Exercice 2 — Estimation
 
-À partir des données d'insolation de Nice et Paris, utilisez les séries pour
+  (a) Estimez vos deux candidats, plus un troisième de votre choix.
+  (b) Présentez les coefficients, leur écart-type et leur significativité dans
+      un tableau lisible.
+  (c) Comparez par AIC et BIC. Les deux critères s'accordent-ils ? Si non,
+      lequel suivez-vous, et pourquoi ?
+  (d) Comparez avec le modèle que retient une procédure automatique
+      (`auto.arima` en `R`, `pmdarima.auto_arima` en `Python`). Est-ce le même ?
+      Si non, qui a raison — et comment le sauriez-vous ?
 
-(a) donner une représentation graphique et tester statistiquement :
+> **Attention à une convention qui piège tout le monde.** La constante affichée
+> par les fonctions d'estimation n'est pas $\phi_0$ mais la **moyenne** du
+> processus. Vérifiez-le en la comparant à la moyenne empirique de la série.
 
-1. la stationarité
-2. l'autocorrélation
-3. la normalité
+---
 
+# Exercice 3 — Diagnostic des résidus
 
-(b) estimer et interpréter un AR(1) pour chaque série, puis, sur les résidus :
+Sur le modèle retenu, testez successivement :
 
-1.  tester autocorrelation, normalité et hétéroscédasticité
-2.  interprétez tous les résultats obtenus 
-3.  discutez la différence qu'il y a entre les séries 
+  (a) **l'absence d'autocorrélation** — Ljung-Box et Box-Pierce. Les deux
+      donnent-ils la même chose ? Comment choisissez-vous le nombre de retards ?
+  (b) **la normalité** — Jarque-Bera, plus un QQ-plot.
+  (c) **l'homoscédasticité** — test de White.
+  (d) **l'absence d'effet ARCH** — test d'Engle.
+  (e) **la forme fonctionnelle** — test de Ramsey (RESET).
 
-### Exercice 2 
+Pour chacun : énoncez l'hypothèse nulle, donnez la $p$-value, concluez.
 
-Simulez un processus AR(1) stationnaire avec 50 observations. Puis
+  (f) **Synthèse.** Le modèle est-il validé ? Si un test rejette, distinguez ce
+      qui invalide l'estimation de ce qui n'invalide que l'inférence.
 
-(a) "testez" graphiquement et testez statistiquement :
+---
 
-1.  la stationarité
-2.  l'autocorrélation
-3.  la normalité 
+# Exercice 4 — Le même travail sur Paris
 
-(b) estimez la série simulée et discutez les résultats
+Refaites les exercices 1 à 3 sur la série annuelle de Paris.
 
-(c) reproduire les étapes (a) et (b) avec 5000 observations
+  (a) Obtenez-vous le même modèle ?
+  (b) Les coefficients estimés diffèrent-ils de façon notable ?
+  (c) **Discutez la différence entre les deux villes.** Ce que vous observez
+      relève-t-il du climat, de la période d'observation, ou du hasard
+      d'échantillonnage ? Comment trancheriez-vous ?
 
-1.  la stationarité
-2.  l'autocorrélation
-3.  la normalité 
+---
 
-(b) estimez la série simulée et discutez les résultats
+# Exercice 5 — Ce que valent les diagnostics en petit échantillon
 
+  (a) Simulez un AR(1) stationnaire de 50 observations. Testez stationnarité,
+      autocorrélation et normalité. Estimez-le. Retrouvez-vous le paramètre ?
+  (b) Recommencez avec 5000 observations. Que change la taille d'échantillon,
+      sur l'estimation comme sur les tests ?
+  (c) Répétez l'expérience (a) deux cents fois et tracez la distribution du
+      coefficient estimé. Est-elle centrée sur la vraie valeur ?
+  (d) **Conclusion pratique.** Vos séries annuelles comptent 84 observations.
+      Qu'est-ce que cet exercice vous dit sur la confiance à leur accorder ?
 
+---
+
+# Exercice 6 — Prévision
+
+  (a) Réestimez votre modèle sur la série de Nice privée des 10 dernières
+      années.
+  (b) Prévoyez ces 10 années et représentez la prévision, son intervalle de
+      confiance et les valeurs réellement observées.
+  (c) Combien d'observations tombent hors de l'intervalle ? Est-ce conforme à
+      ce qu'on attend ?
+  (d) Comparez à une prévision naïve — la moyenne de l'échantillon. Votre
+      modèle fait-il mieux ? Qu'en concluez-vous sur l'intérêt pratique d'un
+      ARMA sur ce type de série ?

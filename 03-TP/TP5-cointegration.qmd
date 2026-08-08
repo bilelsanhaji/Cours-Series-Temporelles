@@ -17,15 +17,18 @@ entre consommation ($c$), richesse ($a$) et revenu ($y$) prédit les rendements
 boursiers futurs. Les trois séries sont $\mathsf{I}(1)$ mais liées par une
 relation stationnaire : c'est le cas d'école de la cointégration en finance.
 
-**Données FRED**, trimestrielles :
+**Données**, trimestrielles, en cache local :
 
-| | Série | Description |
+| | Fichier | Description |
 |---|---|---|
-| $c$ | `PCECC96` | Consommation réelle |
-| $a$ | `TNWBSHNO` | Richesse nette des ménages |
-| $y$ | `DPIC96` | Revenu disponible réel |
+| $c$ | `04-Data/FRED_PCECC96.csv` | Consommation réelle |
+| $a$ | `04-Data/FRED_TNWBSHNO.csv` | Richesse nette des ménages |
+| $y$ | `04-Data/FRED_DPIC96.csv` | Revenu disponible réel |
 
 Passez les trois en logarithme.
+
+> Si un fichier manque, lancez une fois depuis la racine du dépôt :
+> `source("04-Data/mettre-a-jour-donnees-externes.R")`
 
 ---
 

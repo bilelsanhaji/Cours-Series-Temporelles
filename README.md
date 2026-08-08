@@ -51,10 +51,10 @@ la notation.
 |---|---|
 | `00-Syllabus/` | Chapitre 0 : présentation générale, plan, objectifs, évaluation |
 | `01-Slides/` | Les chapitres du cours magistral (Quarto → reveal.js) |
-| `01-Slides/notes/` | Notes de cours détaillées : calcul des autocovariances, stationnarité des AR |
+| `01-Slides/notes/` | Notes détaillées et **fiche de révision** |
 | `01-Slides/extraits/` | Slides retirées du cours et versées aux fiches de TP |
 | `02-TD/` | Les fiches de travaux dirigés (exercices sur papier) |
-| `03-TP/` | Les fiches de travaux sur machine, `R` et `Python` |
+| `03-TP/` | Les fiches de travaux sur machine, `R` et `Python` (voir `03-TP/README.md`) |
 | `04-Data/` | Les séries utilisées en TD et en TP |
 | `05-Eval/` | Sujets de partiel, sujets des TP notés, articles de référence |
 | `05-Eval/tp-notes/` | Les trois TP notés et leur mode d'emploi |
@@ -85,21 +85,21 @@ Les corrigés des TD et des TP y sont déposés **après** chaque séance.
 
 ## Installation
 
-Le cours se fait **en `R`**. Il vous faut :
+**La marche à suivre complète est dans `03-TP/TP0-installation.qmd`**, à faire
+circuler avant la première séance.
 
-1. [R](https://cran.r-project.org/) (≥ 4.2)
-2. [RStudio](https://posit.co/download/rstudio-desktop/) ou
-   [Posit Cloud](https://posit.cloud/) si vous ne pouvez pas installer de logiciel
-3. [Quarto](https://quarto.org/docs/get-started/) **≥ 1.3** — inclus dans les
-   versions récentes de RStudio
+En bref, selon le langage retenu :
 
-Puis, dans la console `R` :
+| | À installer | Paquets | Repli sans installation |
+|---|---|---|---|
+| `R` | [R](https://cran.r-project.org/) ≥ 4.2, [RStudio](https://posit.co/download/rstudio-desktop/) | `source("install-packages.R")` | [Posit Cloud](https://posit.cloud/) |
+| `Python` | [Python](https://www.python.org/downloads/) ≥ 3.10 ou Anaconda | `pip install -r 03-TP/environnements/requirements.txt` | [Google Colab](https://colab.research.google.com/) |
 
-```r
-source("install-packages.R")
-```
+[Quarto](https://quarto.org/docs/get-started/) **≥ 1.3** est nécessaire dans les
+deux cas — il est inclus dans les versions récentes de RStudio.
 
-Ce script installe les paquets manquants et laisse les autres tranquilles.
+Les deux solutions en ligne suffisent pour tout le semestre, **y compris pour
+les TP notés**.
 
 > **Une distribution LaTeX est nécessaire** pour compiler les fiches de TD et de
 > TP en PDF. Le plus simple :
@@ -114,20 +114,24 @@ Ce script installe les paquets manquants et laisse les autres tranquilles.
 |---|---|---|
 | Durées d'insolation, Nice | `04-Data/SH_MIN006088001.csv` | Météo-France |
 | Durées d'insolation, Paris | `04-Data/SH_MIN175114001.csv` | Météo-France |
-| Débit de la Helmsdale (Kilpherid) | `04-Data/riverflowUK.csv` | [NRFA, station 2001](https://nrfa.ceh.ac.uk/data/station/download?stn=2001&dt=gdf) |
 | 27 stations métropolitaines | `04-Data/SH_IN_metropole/` | Météo-France |
+| Débit de la Helmsdale (Kilpherid) | `04-Data/riverflowUK.csv` | [NRFA, station 2001](https://nrfa.ceh.ac.uk/data/station/download?stn=2001&dt=gdf) |
+| Chômage américain, PIB réel, consommation, richesse, revenu | `04-Data/FRED_*.csv` | FRED, mis en cache |
+| Dow Jones, GBP/USD, or 2005 | `04-Data/YAHOO_*.csv` | Yahoo Finance, mis en cache |
 
-Les fiches de TP chargent les deux premières séries **par URL** depuis le dépôt
-GitHub du cours, de sorte qu'elles fonctionnent sans clone préalable. Les mêmes
-fichiers sont versionnés dans `04-Data/` : en cas de coupure réseau, remplacez
-l'URL par le chemin relatif, par exemple
+**Aucun chapitre ni aucune fiche n'appelle d'API.** Les séries FRED et Yahoo
+sont mises en cache par `04-Data/mettre-a-jour-donnees-externes.R`, à relancer
+une fois par an avant la rentrée. Tout compile donc hors ligne, sans clé, et
+donne des chiffres stables d'un rendu à l'autre.
 
-```r
-read_delim("../04-Data/SH_MIN006088001.csv", delim = ";")
-```
+Deux modules — `03-TP/donnees.R` et `03-TP/donnees.py` — se chargent de la
+lecture. Ils prennent le fichier local s'il existe et basculent sinon sur l'URL
+GitHub : les corrigés fonctionnent donc sur Posit Cloud ou Colab sans clone
+préalable. Voir `03-TP/README.md`.
 
-Certains chapitres utilisent en plus l'API [FRED](https://fred.stlouisfed.org/docs/api/api_key.html)
-via `{fredr}`, qui demande une clé personnelle gratuite.
+Le rafraîchissement annuel du cache demande une clé FRED personnelle et
+gratuite, à placer dans `~/.Renviron` sous la forme `FRED_API_KEY=…` —
+**jamais dans un fichier du dépôt**.
 
 ---
 
@@ -135,12 +139,16 @@ via `{fredr}`, qui demande une clé personnelle gratuite.
 
 Les chapitres se rendent de deux façons.
 
-**Pour les étudiants** — un fichier HTML unique et autonome, qui fonctionne hors
-ligne et se dépose tel quel sur Moodle :
+**Pour les étudiants** — une copie expurgée des notes de conduite de séance,
+rendue en HTML autonome dans `etudiant/`. C'est cette version qui se dépose sur
+Moodle et qui est publiée :
 
 ```bash
-quarto render 01-Slides/CM2-arma.qmd
+Rscript 01-Slides/generer-version-etudiant.R
+quarto render 01-Slides/etudiant && quarto render 00-Syllabus/etudiant
 ```
+
+Ou, plus simplement, double-cliquer sur `01-Slides/Version étudiante.command`.
 
 **Pour la salle** — avec le tableau blanc, pour annoter les slides en direct
 (`B` pour le tableau, `C` pour le stylo, `S` pour la vue présentateur) :

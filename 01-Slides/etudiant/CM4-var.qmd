@@ -32,7 +32,8 @@ knitr::opts_chunk$set(
 #| include: false
 library(quantmod)
 library(fredr)
-fredr_set_key(Sys.getenv("FRED_API_KEY"))
+# Les séries externes sont lues dans 04-Data/ : aucune clé requise ici.
+source("04-Data/charger-externes.R")
 library(vars)
 library(forecast)
 library(ggplot2)

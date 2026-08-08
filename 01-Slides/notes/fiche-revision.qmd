@@ -1,0 +1,215 @@
+---
+title: "Fiche de révision"
+subtitle: "Économétrie des séries temporelles · M1 MBFA"
+author: "B. Sanhaji — Université Paris 8"
+format:
+  pdf:
+    number-sections: false
+    geometry: margin=2cm
+    fontsize: 10pt
+---
+
+*À emporter en révision, pas en examen — le partiel se fait sans document.
+Cette fiche rassemble ce qui était traité en séance de rappels les années
+précédentes ; le temps de cours ayant été divisé par deux, il est passé ici.*
+
+\vspace{0.3cm}
+
+# 1. La méthode de Box-Jenkins
+
+Trois étapes, dans cet ordre, et **on ne saute pas la troisième**.
+
+### A. Identification
+
+1. Rendre la série **stationnaire** : différencier si racine unitaire, retirer
+   la tendance si elle est déterministe, agréger ou désaisonnaliser si le cycle
+   domine.
+2. Tracer **ACF et PACF** de la série stationnarisée.
+3. En déduire des ordres candidats :
+
+| | ACF | PACF |
+|---|---|---|
+| **AR($p$)** | décroît (exponentiellement ou en oscillant) | **s'annule après le retard $p$** |
+| **MA($q$)** | **s'annule après le retard $q$** | décroît |
+| **ARMA($p,q$)** | décroît après le retard $q$ | décroît après le retard $p$ |
+
+> **La règle en une phrase.** La coupure nette est du côté de la **PACF** pour un
+> AR, du côté de l'**ACF** pour un MA. Si rien ne coupe nettement, c'est un ARMA
+> — ou du bruit.
+
+### B. Estimation
+
+Maximum de vraisemblance. On retient plusieurs candidats, on les compare par
+**AIC** et **BIC** :
+
+$$\mathsf{AIC} = -2\ln L + 2k \qquad \mathsf{BIC} = -2\ln L + k\ln n$$
+
+Le BIC pénalise plus lourdement dès que $n > 8$ : il choisit des modèles plus
+parcimonieux. En cas de désaccord, dire lequel on suit et pourquoi.
+
+### C. Vérification
+
+Sur les **résidus** du modèle retenu :
+
+| Test | $H_0$ | Un rejet signifie |
+|---|---|---|
+| Ljung-Box, Box-Pierce | pas d'autocorrélation | il reste de la structure — **l'estimation est invalide** |
+| Jarque-Bera | normalité | l'inférence asymptotique est fragile |
+| White, Breusch-Pagan | homoscédasticité | les écarts-types sont faux |
+| Engle | pas d'effet ARCH | volatilité conditionnelle — vers les GARCH |
+| Ramsey (RESET) | forme linéaire correcte | mauvaise spécification |
+
+**La distinction à retenir** : une autocorrélation résiduelle invalide
+l'**estimation**, il faut changer de modèle. Les autres rejets n'invalident que
+l'**inférence** : les coefficients restent convergents, on corrige les
+écarts-types.
+
+\vspace{0.3cm}
+
+# 2. Stabilité et inversibilité
+
+Deux conditions distinctes, sur deux polynômes différents.
+
+| | Porte sur | Polynôme | Condition | Assure |
+|---|---|---|---|---|
+| **Stabilité** | la partie AR | $\Phi(z) = 1 - \phi_1 z - \dots - \phi_p z^p$ | racines de module $> 1$ | la stationnarité |
+| **Inversibilité** | la partie MA | $\Theta(z) = 1 + \theta_1 z + \dots + \theta_q z^q$ | racines de module $> 1$ | l'unicité de la représentation |
+
+### Pourquoi chacune compte
+
+**La stabilité** garantit que le processus admet une représentation
+$\mathsf{MA}(\infty)$ convergente : les chocs anciens s'estompent, la variance
+est finie, les moments ne dépendent pas de $t$. Sans elle, tout ce qu'on estime
+est faux.
+
+**L'inversibilité** garantit qu'un même processus ne correspond qu'à un seul jeu
+de paramètres. Un MA(1) de coefficient $\theta$ et un de coefficient $1/\theta$
+ont **la même ACF** : sans contrainte d'inversibilité, l'estimation ne saurait
+pas les distinguer. Elle permet aussi d'écrire le processus en
+$\mathsf{AR}(\infty)$, donc de calculer les résidus de proche en proche.
+
+### Deux conventions, une seule réalité
+
+| Convention | Polynôme | Condition |
+|---|---|---|
+| Opérateur retard | $\Phi(z) = 0$ | $\lvert z \rvert > 1$ (hors du cercle unité) |
+| Valeurs propres | $\lambda^p - \phi_1\lambda^{p-1} - \dots - \phi_p = 0$ | $\lvert \lambda \rvert < 1$ (dans le cercle) |
+
+Les deux disent la même chose : $\lambda = 1/z$. **Précisez toujours celle que
+vous employez** — une copie qui écrit « racines inférieures à 1 » sans dire
+laquelle ne vaut que la moitié des points.
+
+Le détail complet est dans `01-Slides/notes/stationnarite-racines-AR.qmd`.
+
+\vspace{0.3cm}
+
+# 3. Le cas AR(2), en pratique
+
+$$y_t = \phi_1 y_{t-1} + \phi_2 y_{t-2} + \varepsilon_t$$
+
+### Condition nécessaire et suffisante — le triangle de stationnarité
+
+$$\phi_1 + \phi_2 < 1 \qquad \phi_2 - \phi_1 < 1 \qquad \lvert \phi_2 \rvert < 1$$
+
+Ces trois inégalités dessinent un triangle dans le plan $(\phi_1, \phi_2)$.
+
+### Nature des racines
+
+Le discriminant $\Delta = \phi_1^2 + 4\phi_2$ tranche :
+
+| $\Delta$ | Racines | Comportement de l'ACF |
+|---|---|---|
+| $> 0$ | réelles distinctes | décroissance exponentielle, sans oscillation |
+| $= 0$ | double | décroissance exponentielle |
+| $< 0$ | complexes conjuguées | **décroissance en oscillant** — pseudo-cycle |
+
+Le cas complexe se produit sous la parabole $\phi_2 = -\phi_1^2/4$. C'est lui
+qui produit les cycles amortis qu'on observe sur les séries macroéconomiques.
+
+### Exemples types
+
+| Modèle | $\Delta$ | Stationnaire ? | Allure |
+|---|---|---|---|
+| $y_t = 0{,}5y_{t-1} + 0{,}3y_{t-2} + \varepsilon_t$ | $> 0$ | oui | décroissance lisse |
+| $y_t = 0{,}5y_{t-1} - 0{,}8y_{t-2} + \varepsilon_t$ | $< 0$ | oui | oscillations amorties |
+| $y_t = 1{,}2y_{t-1} - 0{,}2y_{t-2} + \varepsilon_t$ | $> 0$ | **non** ($\phi_1+\phi_2 = 1$) | racine unitaire |
+| $y_t = 2y_{t-1} - y_{t-2} + \varepsilon_t$ | $= 0$ | **non** | racine double unitaire, $\mathsf{I}(2)$ |
+
+\vspace{0.3cm}
+
+# 4. Racines unitaires — l'essentiel
+
+### DS contre TS
+
+| | Modèle | Rendre stationnaire | Effet d'un choc |
+|---|---|---|---|
+| **DS** | $y_t = \mu + y_{t-1} + \varepsilon_t$ | **différencier** | permanent |
+| **TS** | $y_t = \alpha + \beta t + \varepsilon_t$ | **retirer la tendance** | transitoire |
+
+Se tromper coûte cher : dé-trender une DS laisse une série non stationnaire ;
+différencier une TS crée une composante MA(1) parasite de coefficient proche de
+$-1$ — c'est la **sur-différenciation**, repérable à une autocorrélation
+fortement négative au retard 1.
+
+### La procédure de Dickey-Fuller
+
+On part **du modèle le plus général** et on descend :
+
+1. $\Delta y_t = \mu + \beta t + \gamma y_{t-1} + \sum \delta_i \Delta y_{t-i} + \varepsilon_t$
+   — tester $\tau_\tau$ ($H_0 : \gamma = 0$). Si rejet : stationnaire autour
+   d'une tendance, **fin**.
+2. Sinon, tester $\phi_3$ ($H_0 : \gamma = \beta = 0$). Si non rejet, la
+   tendance est superflue : passer au modèle avec constante seule.
+3. Répéter avec $\tau_\mu$ puis $\phi_1$, enfin le modèle sans terme
+   déterministe.
+
+**Les statistiques $\tau$ et $\phi$ ne se lisent ni dans une table de Student, ni
+dans une table de Fisher** : sous $H_0$ la série est non stationnaire, et les
+lois sont tabulées par simulation (Dickey & Fuller 1981).
+
+### La régression fallacieuse
+
+Deux marches aléatoires **indépendantes** régressées l'une sur l'autre donnent un
+$R^2$ élevé et un $t$ significatif dans **environ 85 % des cas** au lieu de 5 %.
+Sur séries stationnaires, on retrouve bien 5 %.
+
+**La règle** : tester l'ordre d'intégration **avant** toute régression. Puis
+différencier — ou, si les séries sont cointégrées, passer à un VECM.
+
+\vspace{0.3cm}
+
+# 5. Multivarié — les points d'examen
+
+**Stabilité d'un VAR** : toutes les valeurs propres de la matrice compagnon de
+module $< 1$ (ou racines du polynôme caractéristique de module $> 1$, selon la
+convention).
+
+**Causalité de Granger** : teste la **prédictibilité**, jamais la causalité.
+$H_0$ : les coefficients des retards de $x$ sont tous nuls dans l'équation de
+$y$. Rédiger « $x$ contient de l'information utile pour prévoir $y$ », pas
+« $x$ cause $y$ ».
+
+**IRF orthogonalisées** : dépendent de l'ordre de Cholesky. Cet ordre est une
+**hypothèse d'identification** — la variable placée en premier ne réagit pas
+dans la période aux chocs des autres. Aucun critère statistique ne le
+justifie ; l'argument est économique.
+
+**Cointégration** : deux séries $\mathsf{I}(1)$ sont cointégrées s'il existe une
+combinaison linéaire $\mathsf{I}(0)$. Engle-Granger teste la racine unitaire des
+résidus d'une régression de long terme — **avec des valeurs critiques
+spécifiques**, plus exigeantes, car les résidus sont estimés. Johansen traite
+les variables symétriquement et teste le **nombre** de relations.
+
+**VECM** : le coefficient d'ajustement doit être **négatif** — la variable
+revient vers son équilibre. Un coefficient positif est ininterprétable.
+
+\vspace{0.4cm}
+
+---
+
+**Format du partiel.** 2 heures, sans document. Cinq parties : concepts (4 pts),
+ARMA (6), racines unitaires (4), VAR (4), cointégration (2), plus une annexe de
+sorties à commenter. La lecture et l'interprétation de sorties comptent
+davantage que les années précédentes : le code ayant quitté le cours magistral,
+on ne vous interrogera pas sur la syntaxe, mais sur ce qu'un résultat dit — et
+sur ce qu'il ne dit pas.

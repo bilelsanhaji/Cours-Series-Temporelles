@@ -35,7 +35,8 @@ knitr::opts_chunk$set(
 #| label: libs2
 #| echo: false
 library(fredr) #https://fred.stlouisfed.org/docs/api/api_key.html
-fredr_set_key(Sys.getenv("FRED_API_KEY"))
+# Les séries externes sont lues dans 04-Data/ : aucune clé requise ici.
+source("04-Data/charger-externes.R")
 library(astsa)
 library(xts)
 library(quantmod)
