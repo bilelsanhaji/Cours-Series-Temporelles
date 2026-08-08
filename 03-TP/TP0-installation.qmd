@@ -98,8 +98,11 @@ Sur Colab, la plupart des paquets sont déjà présents. Il ne manque en génér
 que celui-ci, à installer en tête de notebook :
 
 ```python
-!pip install arch pmdarima
+!pip install arch "numpy<2" pmdarima
 ```
+
+`numpy<2` est nécessaire : `pmdarima` est distribué en wheel compilée contre
+l'ABI `numpy` 1.x et son import échoue avec `numpy` 2.x.
 
 ---
 

@@ -13,9 +13,14 @@ import pandas as pd
 BASE_URL = ("https://raw.githubusercontent.com/bilelsanhaji/"
             "Cours-Series-Temporelles/refs/heads/main/04-Data/")
 
+# Ancré sur ce fichier plutôt que sur le répertoire de travail : donnees.py
+# est importé depuis des notebooks lancés depuis des dossiers différents
+# (racine du dépôt via quarto, ou 03-TP/corriges/ en Jupyter direct).
+RACINE = Path(__file__).resolve().parent.parent
+
 
 def _source(fichier: str, sous_dossier: str = "") -> str:
-    local = Path("04-Data") / sous_dossier / fichier
+    local = RACINE / "04-Data" / sous_dossier / fichier
     if local.exists():
         return str(local)
     suffixe = f"{sous_dossier}/" if sous_dossier else ""
@@ -43,7 +48,7 @@ def annuel(d: pd.DataFrame) -> pd.DataFrame:
 def lire_externe(nom: str) -> pd.DataFrame:
     """Séries FRED / Yahoo mises en cache par
     04-Data/mettre-a-jour-donnees-externes.R"""
-    f = Path("04-Data") / f"{nom}.csv"
+    f = RACINE / "04-Data" / f"{nom}.csv"
     if not f.exists():
         raise FileNotFoundError(
             f"Cache absent : {f}\n  Lancez une fois, depuis la racine du dépôt :\n"

@@ -4,7 +4,10 @@
 # Sur Google Colab, seuls `arch` et `pmdarima` manquent :
 #     !pip install arch pmdarima
 
-numpy>=1.24
+# <2.0 : pmdarima (voir plus bas) est distribué en wheel compilée contre
+# l'ABI numpy 1.x ; avec numpy 2.x son import plante (ValueError sur la
+# taille de numpy.dtype), aucune version de pmdarima ne corrige ça à ce jour.
+numpy>=1.24,<2.0
 pandas>=2.0
 matplotlib>=3.7
 scipy>=1.10

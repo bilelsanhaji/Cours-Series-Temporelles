@@ -90,10 +90,26 @@ Il signale aussi les trois pièges qui coûtent le plus de temps :
 | `R` | `install-packages.R`, à la racine du dépôt |
 | `Python` | `environnements/requirements.txt` |
 
-Pour convertir un corrigé `Python` en notebook Jupyter :
+## Travailler sur notebook
+
+Les corrigés `Python` sont des fichiers `.qmd`. Ils s'ouvrent tels quels dans
+**VS Code** et **Positron**, qui exécutent les cellules directement.
+
+Pour un vrai `.ipynb` — sur Google Colab, par exemple :
 
 ```bash
-quarto convert corriges/TP2-arma-python-corrige.qmd
+# depuis la racine du dépôt
+quarto convert 03-TP/corriges/TP2-arma-python-corrige.qmd
+```
+
+Le chemin doit être celui vu depuis l'endroit où vous lancez la commande. Le
+notebook est écrit à côté du `.qmd`.
+
+Si `quarto convert` échoue, `jupytext` fait la même chose :
+
+```bash
+pip install jupytext
+jupytext --to ipynb 03-TP/corriges/TP2-arma-python-corrige.qmd
 ```
 
 En cas de difficulté d'installation, **Posit Cloud** et **Google Colab**
