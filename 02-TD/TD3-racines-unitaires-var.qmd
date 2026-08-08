@@ -1,7 +1,7 @@
 ---
 title: "Économétrie des Séries Temporelles"
 author: "Fiche TD #3"
-date: "Racine unitaire et VAR"
+subtitle: "Racine unitaire et VAR"
 format: pdf
 ---
 ### Exercice 1 

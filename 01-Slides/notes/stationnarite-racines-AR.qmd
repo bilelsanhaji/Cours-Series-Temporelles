@@ -1,7 +1,7 @@
 ---
 title: "Stationnarité des processus AR : racines et conditions"
 author: "Note de cours"
-date: "2025/2026"
+subtitle: "2025/2026"
 format: pdf
 geometry: "left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm"
 ---

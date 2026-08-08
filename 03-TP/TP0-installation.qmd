@@ -1,7 +1,7 @@
 ---
 title: "Économétrie des Séries Temporelles"
 author: "Fiche TP #0 — Installation"
-date: "À faire **avant** la première séance"
+subtitle: "À faire **avant** la première séance"
 format: pdf
 ---
 

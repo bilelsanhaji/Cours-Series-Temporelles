@@ -1,7 +1,7 @@
 ---
 title: "Économétrie des Séries Temporelles"
 author: "Fiche TP #2"
-date: "Processus ARMA — identification, estimation, diagnostic"
+subtitle: "Processus ARMA — identification, estimation, diagnostic"
 format: pdf
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: "Économétrie des Séries Temporelles"
 author: "Fiche TD #2"
-date: "Processus ARMA stationnaires"
+subtitle: "Processus ARMA stationnaires"
 format: pdf
 ---
 ### Exercice 1

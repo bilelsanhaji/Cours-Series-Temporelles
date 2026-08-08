@@ -1,7 +1,7 @@
 ---
 title: "Économétrie des Séries Temporelles"
 author: "Fiche TD #4"
-date: "Modèles VAR — causalité de Granger et réponses impulsionnelles"
+subtitle: "Modèles VAR — causalité de Granger et réponses impulsionnelles"
 format: pdf
 ---
 

@@ -1,7 +1,7 @@
 ---
 title: "Économétrie des Séries Temporelles"
 author: "Fiche TP #4"
-date: "Modèles VAR — estimation, Granger, réponses impulsionnelles"
+subtitle: "Modèles VAR — estimation, Granger, réponses impulsionnelles"
 format: pdf
 ---
 

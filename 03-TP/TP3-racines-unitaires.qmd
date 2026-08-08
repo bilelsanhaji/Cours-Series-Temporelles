@@ -1,7 +1,7 @@
 ---
 title: "Économétrie des Séries Temporelles"
 author: "Fiche TP #3"
-date: "Racines unitaires, DS/TS et régression fallacieuse"
+subtitle: "Racines unitaires, DS/TS et régression fallacieuse"
 format: pdf
 ---
 
@@ -14,12 +14,13 @@ format: pdf
 **Données.** Trois sources, toutes en cache local — aucune API n'est nécessaire :
 
 | Série | Fichier | Usage |
-|---|---|---|
+|----|----|---|
 | Chômage américain, mensuel | `04-Data/FRED_UNRATE.csv` | exercices 1 et 2 |
 | Or, cours quotidien 2005 | `04-Data/YAHOO_GOLD_2005.csv` | exercice 4 |
 | Insolation annuelle, Nice | `04-Data/SH_MIN006088001.csv` | exercice 3 |
 
 > Si un fichier manque, lancez une fois depuis la racine du dépôt :
+
 > `source("04-Data/mettre-a-jour-donnees-externes.R")`
 
 ---
