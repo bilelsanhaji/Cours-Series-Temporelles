@@ -5,9 +5,8 @@ subtitle: "Processus ARMA — identification, estimation, diagnostic"
 format: pdf
 ---
 
-*Séance 7, en préparation du TP noté n°1 qui a lieu dans le même créneau.
-Cette fiche reprend l'ensemble des mises en œuvre qui figuraient auparavant
-dans le chapitre 2 du cours.*
+*Séance 7. Cette fiche prépare le TP noté n°1, qui a lieu dans le même créneau :
+elle couvre toute la mise en œuvre du chapitre 2.*
 
 # Avant de commencer
 

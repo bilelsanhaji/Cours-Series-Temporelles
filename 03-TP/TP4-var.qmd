@@ -5,9 +5,8 @@ subtitle: "Modèles VAR — estimation, Granger, réponses impulsionnelles"
 format: pdf
 ---
 
-*Séance 11. Ce TP reprend le parcours appliqué qui figurait auparavant dans le
-chapitre 4 du cours. Il prépare le TP noté n°3, qui se déroule dans le même
-créneau.*
+*Séance 11. Cette fiche prépare le TP noté n°3, qui a lieu dans le même créneau :
+elle couvre toute la mise en œuvre du chapitre 4.*
 
 # Avant de commencer
 

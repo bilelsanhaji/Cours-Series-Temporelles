@@ -22,11 +22,8 @@ project:
   # aussi bien depuis 01-Slides/ que depuis 01-Slides/etudiant/.
   execute-dir: project
   render:
-    # Vos sources, avec les notes de conduite de séance. Non publiées.
     - "00-Syllabus/*.qmd"
     - "01-Slides/*.qmd"
-    # Les copies expurgées, engendrées par 01-Slides/generer-version-etudiant.R.
-    # C'est cette version-là qui part sur Moodle et sur GitHub.
     - "00-Syllabus/etudiant/*.qmd"
     - "01-Slides/etudiant/*.qmd"
     - "01-Slides/notes/*.qmd"
@@ -35,10 +32,7 @@ project:
     - "05-Eval/**/*.qmd"
     - "06-Enseignant/*.qmd"
     - "!99-Archive/"
-    # Les README se lisent en Markdown sur GitHub. Les rendre produit un HTML
-    # non autonome, accompagné d'un dossier *_files/ : le script de publication
-    # le refuse, à juste titre. `quarto render 01-Slides` les ramasserait sans
-    # cette exclusion.
+    # Les README se lisent en Markdown : inutile de les rendre en HTML.
     - "!**/README.md"
     - "!*.md"
 

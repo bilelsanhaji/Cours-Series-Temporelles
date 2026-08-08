@@ -22,11 +22,15 @@
 #
 #     source("04-Data/mettre-a-jour-donnees-externes.R")
 #
-# Il faut une clé FRED dans ~/.Renviron :
+# Il faut une clé FRED personnelle, gratuite, dans ~/.Renviron :
 #
 #     FRED_API_KEY=votre_cle
 #
-# (fichier déjà couvert par le .gitignore ; redémarrer R après l'avoir créé)
+# Redémarrer R après avoir créé ce fichier. Une clé ne se met jamais dans un
+# fichier du projet.
+#
+# Ce script documente la provenance des séries de 04-Data/ : vous n'avez pas
+# besoin de le lancer, les données sont déjà là.
 
 library(fredr)
 library(quantmod)

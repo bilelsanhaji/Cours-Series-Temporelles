@@ -5,7 +5,7 @@ subtitle: "Racines unitaires, DS/TS et régression fallacieuse"
 format: pdf
 ---
 
-*Séance 9, en préparation du TP noté n°2 qui a lieu dans le même créneau.*
+*Séance 9. Cette fiche prépare le TP noté n°2, qui a lieu dans le même créneau.*
 
 # Avant de commencer
 

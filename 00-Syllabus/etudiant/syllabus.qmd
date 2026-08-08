@@ -7,9 +7,7 @@ format:
     footer: "Économétrie des séries temporelles — Chapitre 0"
 ---
 
-<!-- Version étudiante : engendrée automatiquement depuis la source
-     enseignante par 01-Slides/generer-version-etudiant.R.
-     Ne pas modifier ici — les changements seraient écrasés. -->
+<!-- Fichier engendré : toute modification ici serait écrasée. -->
 
 ```{r}
 #| label: setup

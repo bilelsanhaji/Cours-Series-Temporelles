@@ -119,3 +119,4 @@ Thumbs.db
 # utilité, et il n'est jamais autonome (il traîne un dossier README_files/),
 # ce qui fait échouer le contrôle d'autonomie du script de publication.
 README.html
+01-Slides/generer-version-etudiant.R
