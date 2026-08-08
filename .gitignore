@@ -5,6 +5,21 @@
 # Déroulé des séances, notes de préparation
 06-Enseignant/
 
+# Chapitres — vos sources.
+#
+# Elles contiennent des blocs `::: {.notes}` : minutage, points de décrochage,
+# transitions. Ces notes sont EMBARQUÉES dans le HTML rendu : un étudiant qui
+# appuie sur `S` ouvre la vue présentateur et les lit. Ni les sources ni leur
+# rendu ne doivent donc être publiés.
+#
+# Ce qui est publié, c'est la copie expurgée engendrée par
+# `01-Slides/generer-version-etudiant.R` dans `etudiant/` — et elle, elle n'est
+# pas ignorée (les motifs ci-dessous ne traversent pas les sous-dossiers).
+01-Slides/*.qmd
+01-Slides/*.html
+00-Syllabus/syllabus.qmd
+00-Syllabus/*.html
+
 # Corrigés des TD et des TP.
 # Ils sont diffusés APRÈS chaque séance, un par un, en forçant l'ajout :
 #     git add -f 02-TD/corriges/TD1-proprietes-stochastiques-corrige.pdf
@@ -12,6 +27,22 @@
 # Une fois ajouté au suivi, un fichier reste suivi malgré cette règle.
 02-TD/corriges/
 03-TP/corriges/
+
+# Sujets d'évaluation à venir.
+#
+# Le dépôt est PUBLIC : un sujet poussé ici est un sujet diffusé. Le dossier
+# entier est ignoré, PDF compris — un `quarto render` du projet compile le
+# sujet à venir, et sans cette règle le PDF partirait au commit suivant.
+#
+# Les sujets des années passées déjà suivis le restent (git ignore les règles
+# pour un fichier déjà indexé). Pour publier un nouveau sujet APRÈS la session :
+#     git add -f 05-Eval/partiel/Partiel_2627_S1.pdf
+05-Eval/partiel/
+
+# TP notés : sujets, barèmes, et surtout DONNÉES PERSONNELLES.
+# `etudiants.csv`, `attribution.csv` et `fiches/` contiennent des noms et des
+# numéros d'étudiants. Ils ne doivent quitter votre machine sous aucun prétexte.
+05-Eval/tp-notes/
 
 # Sources d'origine, variantes non retenues, brouillons
 99-Archive/
@@ -79,3 +110,12 @@ rendus/
 Thumbs.db
 
 /.quarto/
+
+# Slides retirées des chapitres lors de la refonte 2026-2027 : matière première
+# pour les fiches de TP, pas un support diffusable en l'état.
+01-Slides/extraits/
+
+# Les README se lisent en Markdown sur GitHub : leur rendu HTML n'a aucune
+# utilité, et il n'est jamais autonome (il traîne un dossier README_files/),
+# ce qui fait échouer le contrôle d'autonomie du script de publication.
+README.html

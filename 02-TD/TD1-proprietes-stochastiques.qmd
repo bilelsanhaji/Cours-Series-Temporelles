@@ -52,7 +52,9 @@ Supposons que $\{Y_t\}$ est stationnaire avec une fonction d'autocovariance $\ga
 ### Exercice  5
 
 Supposons que 
-\[ Y_t = 5 + 2t + X_t, \]
+$$
+Y_t = 5 + 2t + X_t,
+$$
 où $\{X_t\}$ est une série stationnaire de moyenne nulle avec une fonction d'autocovariance $\gamma_k$.
 
   (a) Trouvez la fonction de moyenne pour $\{Y_t\}$.

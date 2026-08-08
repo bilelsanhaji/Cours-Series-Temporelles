@@ -1,0 +1,1021 @@
+---
+title: "Chapitre 4 — Séries temporelles multivariées"
+subtitle: "Économétrie des séries temporelles · M1 MBFA"
+# Configuration commune (thème, tableau blanc, découpage) : _quarto.yml à la racine
+format:
+  revealjs:
+    footer: "Économétrie des séries temporelles — Chapitre 4"
+---
+
+<!-- Version étudiante : engendrée automatiquement depuis la source
+     enseignante par 01-Slides/generer-version-etudiant.R.
+     Ne pas modifier ici — les changements seraient écrasés. -->
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(
+  #eval = FALSE,
+  echo = FALSE,
+  error = TRUE,
+  fig.width = 10, 
+  fig.height = 5,
+  dpi = 192,
+  fig.keep ="last",
+  message = FALSE,
+  warning = FALSE,
+  results = "markup"
+)
+```
+
+```{r}
+#| label: libs
+#| include: false
+library(quantmod)
+library(fredr)
+fredr_set_key(Sys.getenv("FRED_API_KEY"))
+library(vars)
+library(forecast)
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+library(urca)
+library(astsa)
+library(aTSA)
+library(forecast)
+library(ppcor)
+library(MASS)
+library(tseries)
+# Load necessary libraries
+library(FinTS)  # For ArchTest()
+```
+
+------------------------------------------------------------------------
+
+# Structure du cours : 
+
+Autorégressions Vectorielles -- VAR
+
+Exemples de base
+
+Propriétés 
+
+- Stationnarité
+
+Revisiter les processus ARMA univariés
+
+Prévision
+    
+- Causalité de Granger
+- Fonctions de réponse impulsionnelle
+
+Cointégration
+
+- Examiner les relations à long terme
+- Déterminer si un VAR est cointégré
+- Modèles de Correction d'Erreur
+- Tests de Cointégration - Engle-Granger
+
+------------------------------------------------------------------------
+
+## Autorégressions Vectorielles -- VAR
+
+------------------------------------------------------------------------
+
+# Pourquoi l'analyse VAR ?
+
+## VAR Stationnaires
+- Déterminer si les variables se rétroagissent les unes sur les autres
+- Améliorer les prévisions
+- Modéliser l'effet d'un choc dans une série sur une autre
+- Différencier entre les dynamiques à court terme et à long terme
+
+## Cointégration
+- Lier les marches aléatoires
+- Découvrir les relations à long terme
+- Peut améliorer considérablement les prévisions à moyen et long terme
+
+------------------------------------------------------------------------
+
+# Définition du VAR
+
+**Autorégression d'ordre P, AR(P)** :
+$$ y_t = \phi_0 + \phi_1 y_{t-1} + \ldots + \phi_P y_{t-p} + \varepsilon_t $$
+
+**Autorégression vectorielle d'ordre P, VAR(P)** :
+$$ \mathbf{y}_t = \Phi_0 + \Phi_1 \mathbf{y}_{t-1} + \ldots + \Phi_P \mathbf{y}_{t-p} + \boldsymbol{\varepsilon}_t $$
+
+où $\mathbf{y}_t$ et $\boldsymbol{\varepsilon}_t$ sont des vecteurs de dimension $k \times 1$ &nbsp;
+
+**VAR(1) bivarié** :
+$$
+\begin{pmatrix}
+y_{1,t} \\
+y_{2,t}
+\end{pmatrix}
+=
+\begin{pmatrix}
+\phi_{01} \\
+\phi_{02}
+\end{pmatrix}
++
+\begin{pmatrix}
+\phi_{11} & \phi_{12} \\
+\phi_{21} & \phi_{22}
+\end{pmatrix}
+\begin{pmatrix}
+y_{1,t-1} \\
+y_{2,t-1}
+\end{pmatrix}
++
+\begin{pmatrix}
+\varepsilon_{1,t} \\
+\varepsilon_{2,t}
+\end{pmatrix}
+$$
+
+**Exprime de manière compacte deux modèles liés** :
+$$ y_{1,t} = \phi_{01} + \phi_{11} y_{1,t-1} + \phi_{12} y_{2,t-1} + \varepsilon_{1,t} $$
+$$ y_{2,t} = \phi_{02} + \phi_{21} y_{1,t-1} + \phi_{22} y_{2,t-1} + \varepsilon_{2,t} $$
+
+------------------------------------------------------------------------
+
+# Stationnarité Revisitée
+
+La stationnarité est une forme statistiquement significative de régularité. 
+
+Un processus stochastique ${y_t}$ est stationnaire en covariance si :
+
+- $E[y_t] = \mu, \quad \forall t$ 
+- $V[y_t] = \sigma^2, \quad \sigma^2 < \infty,\; \forall t$ 
+- $E[(y_t - \mu)(y_{t-s} - \mu)] = \gamma_s, \quad\forall t,s$
+
+**Stationnarité de l'AR(1)** : $y_t = \phi y_{t-1} + \varepsilon_t$
+
+- $\mid\phi\mid < 1$
+- $\varepsilon_t$ est un bruit blanc
+
+**Stationnarité de l'AR(P)** : $y_t = \phi_1 y_{t-1} + \ldots + \phi_P y_{t-P} + \varepsilon_t$
+
+- Les racines de $(z^P - \phi_1 z^{P-1} - \phi_2 z^{P-2} - \ldots - \phi_{P-1} z - \phi_P)$ sont inférieures à 1
+- $\varepsilon_t$ est un bruit blanc
+
+*Pas de dépendance à* $t$
+
+------------------------------------------------------------------------
+
+# Relation avec AR
+
+## AR(1)
+
+$$\begin{aligned}
+y_t &= \phi_0 + \phi_1 y_{t-1} + \varepsilon_t\\
+    &= \phi_0 + \phi_1 (\phi_0 + \phi_1 y_{t-2} + \varepsilon_{t-1}) + \varepsilon_t \\
+    &= \phi_0 + \phi_1 \phi_0 + \phi_1^2 y_{t-2} + \phi_1 \varepsilon_{t-1} + \varepsilon_t \\
+    &= \phi_0 + \phi_1 \phi_0 + \phi_1^2 (\phi_0 + \phi_1 y_{t-3} + \varepsilon_{t-2}) + \phi_1 \varepsilon_{t-1} + \varepsilon_t \\
+    & \vdots \\
+    &= \sum_{i=0}^{\infty} \phi_1^i \phi_0 + \sum_{i=0}^{\infty} \phi_1^i \varepsilon_{t-i} \\
+    &= (1 - \phi_1)^{-1} \phi_0 + \sum_{i=0}^{\infty} \phi_1^i \varepsilon_{t-i}
+\end{aligned}$$
+
+------------------------------------------------------------------------
+
+# Relation avec AR
+
+## VAR(1)
+
+$$\begin{aligned}
+\mathbf{y}_t &= \boldsymbol{\Phi}_0 + \boldsymbol{\Phi}_1 \mathbf{y}_{t-1} + \boldsymbol{\varepsilon}_t\\
+    &= \boldsymbol{\Phi}_0 + \boldsymbol{\Phi}_1 (\boldsymbol{\Phi}_0 + \boldsymbol{\Phi}_1 \mathbf{y}_{t-2} + \boldsymbol{\varepsilon}_{t-1}) + \boldsymbol{\varepsilon}_t \\
+    &= \boldsymbol{\Phi}_0 + \boldsymbol{\Phi}_1 \boldsymbol{\Phi}_0 + \boldsymbol{\Phi}_1^2 \mathbf{y}_{t-2} + \boldsymbol{\Phi}_1 \boldsymbol{\varepsilon}_{t-1} + \boldsymbol{\varepsilon}_t \\
+    &= \boldsymbol{\Phi}_0 + \boldsymbol{\Phi}_1 \boldsymbol{\Phi}_0 + \boldsymbol{\Phi}_1^2 (\boldsymbol{\Phi}_0 + \boldsymbol{\Phi}_1 \mathbf{y}_{t-3} + \boldsymbol{\varepsilon}_{t-2}) + \boldsymbol{\Phi}_1 \boldsymbol{\varepsilon}_{t-1} + \boldsymbol{\varepsilon}_t \\
+    & \vdots \\
+    &= \sum_{i=0}^{\infty} \boldsymbol{\Phi}_1^i \boldsymbol{\Phi}_0 + \sum_{i=0}^{\infty} \boldsymbol{\Phi}_1^i \boldsymbol{\varepsilon}_{t-i} \\
+    &= (\mathbf{I}_k - \boldsymbol{\Phi}_1)^{-1} \boldsymbol{\Phi}_0 + \sum_{i=0}^{\infty} \boldsymbol{\Phi}_1^i \boldsymbol{\varepsilon}_{t-i}
+\end{aligned}$$
+
+------------------------------------------------------------------------
+
+# Propriétés d'un VAR(1) et AR(1)
+
+## Moyenne, Variance, Autocovariance
+
+$$
+\begin{array}{lll}
+\textbf{Propriété} & \textbf{AR(1)} & \textbf{VAR(1)} \\
+\text{Équation} & y_t = \phi_0 + \phi_1 y_{t-1} + \varepsilon_t & \mathbf{y}_t = \boldsymbol{\Phi}_0 + \boldsymbol{\Phi}_1 \mathbf{y}_{t-1} + \boldsymbol{\varepsilon}_t \\
+\text{Moyenne} & \frac{\phi_0}{1 - \phi_1} & (\mathbf{I}_k - \boldsymbol{\Phi}_1)^{-1} \boldsymbol{\Phi}_0 \\
+\text{Variance} & \frac{\sigma^2}{1 - \phi_1^2} & (\mathbf{I} - \boldsymbol{\Phi}_1 \otimes \boldsymbol{\Phi}_1)^{-1} \text{vec}(\boldsymbol{\Sigma}) \\
+\text{Autocovariance } s & \gamma_s = \phi_1^s V[y_t] & \boldsymbol{\Gamma}_s = \boldsymbol{\Phi}_1^s V[\mathbf{y}_t] \\
+\text{Autocovariance } -s & \gamma{-s} = \phi_1^s V[y_t] & \boldsymbol{\Gamma}{-s} = V[\mathbf{y}_t] \boldsymbol{\Phi}_1^{s\prime} \\
+\end{array}
+$$
+
+Les autocovariances des processus vectoriels ne sont pas symétriques, mais $\boldsymbol{\Gamma}_s = \boldsymbol{\Gamma}_{-s}'$
+
+## Stationnarité
+
+- AR(1) : $|\phi_1| < 1$
+- VAR(1) : $|\lambda_i| < 1$ où $\lambda_i$ sont les valeurs propres de $\boldsymbol{\Phi}_1$
+
+------------------------------------------------------------------------
+
+# VAR -- Relation PIB / Chômage
+
+## Modèle
+
+$$
+\begin{pmatrix}
+\text{PIB}_t \\
+\text{CHO}_t
+\end{pmatrix}
+=
+\begin{pmatrix}
+0.547^{\star\star\star} \\
+0.049^{\star}
+\end{pmatrix}
++
+\begin{pmatrix}
+0.182^{\star\star} & -0.639^{\star\star\star} \\
+-0.096^{\star\star\star} & 0.507^{\star\star\star}
+\end{pmatrix}
+\begin{pmatrix}
+\text{PIB}_{t-1} \\
+\text{CHO}_{t-1}
+\end{pmatrix}
++
+\begin{pmatrix}
+\varepsilon_{1,t} \\
+\varepsilon_{2,t}
+\end{pmatrix}
+$$
+
+Significance : $\star\star\star : 1\%,\; \star\star : 5\%, \star : 10\%$
+
+------------------------------------------------------------------------
+
+# Modèles
+
+&nbsp;
+
+**Modèle du PIB**
+$$
+\text{PIB}_t = \phi_{01} + \phi_{11,1} \text{PIB}_{t-1} + \phi_{12,1} \text{CHO}_{t-1} + \varepsilon_{1,t}
+$$
+
+**Modèle du Chomage**
+$$
+\text{CHO}_t = \phi_{02} + \phi_{21,1} \text{PIB}_{t-1} + \phi_{22,1} \text{CHO}_{t-1} + \varepsilon_{2,t}
+$$
+
+**Estimations VAR(1)**
+$$
+\text{PIB}_t = 0.547^{\star\star\star}  + 0.182^{\star\star}      \text{PIB}_{t-1} -0.639^{\star\star\star} \text{CHO}_{t-1} + \varepsilon_{1,t}
+$$
+$$
+\text{CHO}_t = 0.049^{\star}            -0.096^{\star\star\star}  \text{PIB}_{t-1} + 0.507^{\star\star\star} \text{CHO}_{t-1} + \varepsilon_{2,t}
+$$
+
+**Estimations AR(1)**
+$$
+\text{PIB}_t = 0.648^{\star\star\star}  + 0.414^{\star\star\star}\text{PIB}_{t-1} \quad\quad\quad\quad\quad\quad\quad\quad  + \varepsilon_{1,t}
+$$
+$$
+\text{CHO}_t = -0.003^{}               \quad\quad\quad\quad \quad\quad\quad\quad      + 0.692^{\star\star\star} \text{CHO}_{t-1} + \varepsilon_{2,t}
+$$
+
+------------------------------------------------------------------------
+
+# Données
+
+$y_1$ : **PIB**
+  
+$y_2$ : **Chomâge**
+  
+Pays : **USA**
+  
+Période : **jan. 1980 - déc. 2019**
+  
+Fréquence : **trimestrielle**
+
+------------------------------------------------------------------------
+
+## VAR(P) est en réalité un VAR(1)
+
+**Forme compagnon** :
+
+$$ \mathbf{y}_t = \Phi_0 + \Phi_1 \mathbf{y}_{t-1} + \Phi_2 \mathbf{y}_{t-2} + \ldots + \Phi_P \mathbf{y}_{t-P} + \boldsymbol{\varepsilon}_t $$
+
+**Reformuler en un seul VAR(1)** où $\mu = E[\mathbf{y}_t] = (I - \Phi_1 - \ldots - \Phi_P)^{-1} \Phi_0$
+
+$$ \mathbf{z}_t = \Upsilon \mathbf{z}_{t-1} + \boldsymbol{\xi}_t $$
+
+$$
+\mathbf{z}_t =
+\begin{pmatrix}
+\mathbf{y}_t - \boldsymbol{\mu} \\
+\mathbf{y}_{t-1} - \boldsymbol{\mu} \\
+\vdots \\
+\mathbf{y}_{t-P+1} - \boldsymbol{\mu}
+\end{pmatrix}
+, 
+\Upsilon =
+\begin{pmatrix}
+\Phi_1 & \Phi_2 & \Phi_3 & \ldots & \Phi_{P-1} & \Phi_P \\
+I_k & 0 & 0 & \ldots & 0 & 0 \\
+0 & I_k & 0 & \ldots & 0 & 0 \\
+\vdots & \vdots & \vdots & \ddots & \vdots & \vdots \\
+0 & 0 & 0 & \ldots & I_k & 0
+\end{pmatrix}
+$$
+
+- Tous les résultats peuvent être directement appliqués à la forme compagnon.
+- Peut également être utilisé pour transformer AR(P) en VAR(1)
+
+------------------------------------------------------------------------
+
+## Prévisions avec VAR
+
+- Identique au cas univarié
+
+$$
+\mathbf{y}_{t}=\boldsymbol{\Phi}_{0}+\boldsymbol{\Phi}_{1} \mathbf{y}_{t-1}+\boldsymbol{\varepsilon}_{t}
+$$
+
+- Prévision optimale à 1 étape :
+
+$$
+\begin{aligned}
+\mathsf{E}_{t}\left[\mathbf{y}_{t+1}\right] & =\mathsf{E}_{t}\left[\boldsymbol{\Phi}_{0}\right]+\mathsf{E}_{t}\left[\boldsymbol{\Phi}_{1} \mathbf{y}_{t}\right]+\mathsf{E}_{t}\left[\boldsymbol{\varepsilon}_{t+1}\right] \\
+& =\boldsymbol{\Phi}_{0}+\boldsymbol{\Phi}_{1} \mathbf{y}_{t}+\mathbf{0}
+\end{aligned}
+$$
+
+- Prévision optimale à $h$ étapes :
+
+$$
+\begin{aligned}
+\mathsf{E}_{t}\left[\mathbf{y}_{t+h}\right] & =\boldsymbol{\Phi}_{0}+\boldsymbol{\Phi}_{1} \boldsymbol{\Phi}_{0}+\ldots+\boldsymbol{\Phi}_{1}^{h-1} \boldsymbol{\Phi}_{0}+\boldsymbol{\Phi}_{1}^{h} \mathbf{y}_{t} \\
+& =\sum_{i=0}^{h-1} \boldsymbol{\Phi}_{1}^{i} \boldsymbol{\Phi}_{0}+\boldsymbol{\Phi}_{1}^{h} \mathbf{y}_{t}
+\end{aligned}
+$$
+
+- Prévision de plus haut ordre peut être calculée de manière récursive
+
+$$
+\mathsf{E}_{t}\left[\mathbf{y}_{t+h}\right]=\boldsymbol{\Phi}_{0}+\boldsymbol{\Phi}_{1} \mathsf{E}_{t}\left[\mathbf{y}_{t+h-1}\right]+\ldots+\boldsymbol{\Phi}_{P} \mathsf{E}_{t}\left[\mathbf{y}_{t+h-P}\right]
+$$
+
+------------------------------------------------------------------------
+
+## Qu'est-ce qui fait une bonne prévision ?
+
+- Résidus de prévision
+
+$$
+\hat{e}_{t+h \mid t}=y_{t+h}-\hat{y}_{t+h \mid t}
+$$
+
+- Les résidus *ne sont pas* un bruit blanc
+- Peut contenir une composante MA($h-1$)
+
+  - Erreur de prévision pour $y_{t+1}-\widehat{y}_{t+1 \mid t-h+1}$ n'était pas connue au moment $t$.
+  
+- Tracez vos résidus
+- ACF des résidus
+- Régressions de Mincer-Zarnowitz
+
+- Procédure à trois périodes
+
+  - Échantillon d'entraînement : Utilisé pour construire le modèle
+  - Échantillon de validation : Utilisé pour affiner le modèle
+  - Échantillon d'évaluation : Test ultime, idéalement en une seule fois
+
+------------------------------------------------------------------------
+
+## Prévision multi-étapes
+
+**Deux méthodes**
+
+- Méthode itérative
+  - Construire un modèle pour les prévisions à 1 étape
+  $$
+  \mathbf{y}_{t}=\boldsymbol{\Phi}_{0}+\boldsymbol{\Phi}_{1} \mathbf{y}_{t-1}+\boldsymbol{\varepsilon}_{t}
+  $$
+  - Itérer la prévision jusqu'à la période $h$
+  $$
+  \hat{\mathbf{y}}_{t+h \mid t}=\sum_{i=0}^{h-1} \boldsymbol{\Phi}_{1}^{i} \boldsymbol{\Phi}_{0}+\boldsymbol{\Phi}_{1}^{h} \mathbf{y}_{t}
+  $$
+  - Utilise efficacement les informations
+  - Impose beaucoup de structure au problème
+
+- Méthode directe
+  - Construire un modèle pour les prévisions à $h$ étapes
+  $$
+  \mathbf{y}_{t}=\boldsymbol{\Phi}_{0}+\boldsymbol{\Phi}_{h} \mathbf{y}_{t-h}+\boldsymbol{\varepsilon}_{t}
+  $$
+  - Prévision directe en utilisant une méthode pseudo à 1 étape
+  $$
+  \hat{\mathbf{y}}_{t+h \mid t}=\boldsymbol{\Phi}_{0}+\boldsymbol{\Phi}_{h} \mathbf{y}_{t}
+  $$
+  - Robuste à certaines non-linéarités
+
+------------------------------------------------------------------------
+
+## Évaluation des prévisions multi-étapes
+
+- L'évaluation des prévisions multi-étapes est identique à l'évaluation des prévisions à une étape avec une réserve
+- Les erreurs de prévision à $h$ étapes peuvent être corrélées avec toute erreur de prévision non connue au moment $t$
+
+$$
+\hat{e}_{t+1 \mid t-h+1}, \hat{e}_{t+2 \mid t-h+2}, \ldots, \hat{e}_{t+h-1 \mid t-1}
+$$
+
+- Conduit à une structure MA($h-1$) dans les erreurs de prévision
+- Solutions :
+
+  - Utiliser une régression GMZ régulière avec un estimateur de covariance Newey-West
+  $$
+  y_{t+h}-\hat{y}_{t+h \mid t}=\beta_{1}+\beta_{2} \hat{y}_{t+h \mid t}+\gamma \mathbf{x}_{t}+\eta_{t}
+  $$
+  $$H_{0}: \beta_{1}=\beta_{2}=\gamma=0, H_{1}: \beta_{1} \neq 0 \cup \beta_{2} \neq 0 \cup \gamma_{j} \neq 0 \quad \exists j$$
+  - Modéliser explicitement le MA($h-1$) et utiliser un estimateur de covariance standard
+  $$
+  y_{t+h}-\hat{y}_{t+h \mid t}=\beta_{1}+\beta_{2} \hat{y}_{t+h \mid t}+\gamma \mathbf{x}_{t}+\eta_{t}+\sum_{i=1}^{h-1} \theta_{i}\eta_{t-i}
+  $$
+  
+  *Note* : $H_0$ est la même ; n'impose pas de restriction sur $\theta$
+
+------------------------------------------------------------------------
+
+## Performances de prévision VAR vs AR
+
+1. Le taux de chômage,  
+2. Le taux des Fed Funds,  
+3. L’inflation.  
+
+Les prévisions sont réalisées à partir de **50 % de l’échantillon disponible**, et les paramètres du modèle sont réestimés à chaque itération. 
+
+La précision des prévisions est mesurée par la **Mean Squared Error (MSE) hors échantillon**, comparée à celle d'un **modèle de référence** (random walk pour le Fed Funds rate et moyenne historique pour les autres variables). 
+
+Deux variantes du VAR sont testées :  
+
+  - **Modèle restreint** : Forcé à converger vers la moyenne historique.  
+  - **Modèle non restreint** : Estime librement les paramètres, y compris l’intercept.  
+
+Le VAR intègre des interactions entre plusieurs séries temporelles, offrant des prévisions plus précises que les modèles univariés dans 7 cas sur 12. Lorsqu’il n’est pas optimal, il reste compétitif. 
+
+En **politique monétaire** et plus généralement en macroéconomie, permet d'anticiper l’impact des chocs et améliorer la prise de décision.
+
+------------------------------------------------------------------------
+
+# Estimation
+
+## Estimation et Identification
+
+- Identification univariée : Box-Jenkins
+
+  - Utiliser ACF et PACF pour déterminer l'ordre de décalage AR et MA
+  - Examiner les résidus
+  - Principe de parcimonie
+
+- L'autocorrélation d'un processus scalaire est définie
+$$
+\rho_{s}=\frac{\gamma_{s}}{\gamma_{0}}
+$$
+où $\gamma_{s}$ est la $s^{\text {ème }}$ autocovariance
+  - Coefficient de régression :
+$$
+y_{t}=\mu+\rho_{s} y_{t-s}+\varepsilon_{t}
+$$
+
+- Autocorrélation partielle $\psi_{s}$
+
+  - Interprétation de régression de la $s^{\text {ème }}$ autocorrélation partielle :
+$$
+y_{t}=\mu+\phi_{1} y_{t-1}+\phi_{2} y_{t-2}+\ldots+\phi_{s-1} y_{t-s+1}+\psi_{s} y_{t-s}+\varepsilon_{t}
+$$
+  - $\psi$ est la $s^{\text {ème }}$ autocorrélation partielle
+
+------------------------------------------------------------------------
+
+## CCF et PCCF 
+### (Fonction Cross Correlation) et (Fonction Cross Correlation Partielle)
+
+- Équivalents multivariés
+  
+  - ACF et PACF ont les mêmes définitions de régression
+  - Fonction de corrélation croisée
+  $$
+  \begin{aligned}
+  & \rho_{x y, s}=\frac{\mathsf{E}\left[\left(x_{t}-\mu_{x}\right)\left(y_{t-s}-\mu_{y}\right)\right]}{\sqrt{\mathrm{V}\left[x_{t}\right] \mathrm{V}\left[y_{t}\right]}}
+  \end{aligned}
+  $$
+  $$
+  \rho_{y x, s}=\frac{\mathsf{E}\left[\left(y_{t}-\mu_{y}\right)\left(x_{t-s}-\mu_{x}\right)\right]}{\sqrt{\mathrm{V}\left[x_{t}\right] \mathrm{V}\left[y_{t}\right]}}
+  $$
+  
+  - Généralement différent
+  - Fonction de corrélation partielle croisée $\psi_{x y, s}$
+  $$
+  \begin{aligned}
+  x_{t}= & \phi_{0}+\phi_{x 1} x_{t-1}+\ldots+\phi_{x s-1} x_{t-(s-1)} \\
+  & +\phi_{y 1} y_{t-1}+\ldots+\phi_{y s-1} y_{t-(s-1)}+\varphi_{x y, s} y_{t-s}+\varepsilon_{x, t}
+  \end{aligned}
+  $$
+    - Peut aider à identifier l'ordre VAR
+
+- Problème plus profond : trop nombreux et trop compliqués
+- Solution simple : Sélection de modèle
+
+------------------------------------------------------------------------
+
+## Interprétation des CCF et PCCF
+
+- $y$ a une dynamique (Hétérogène) HAR et se "déverse" dans $x$
+
+$$
+\begin{aligned}
+{\left[\begin{array}{c}
+x_{t} \\
+y_{t}
+\end{array}\right]=} & {\left[\begin{array}{cc}
+0.5 & 0.9 \\
+.0 & 0.47
+\end{array}\right]\left[\begin{array}{c}
+x_{t-1} \\
+y_{t-1}
+\end{array}\right]+\sum_{i=2}^{5}\left[\begin{array}{cc}
+0 & 0 \\
+0 & 0.06
+\end{array}\right]\left[\begin{array}{c}
+x_{t-i} \\
+y_{t-i}
+\end{array}\right] } \\
+& +\sum_{j=6}^{22}\left[\begin{array}{cc}
+0 & 0 \\
+0 & 0.01
+\end{array}\right]\left[\begin{array}{c}
+x_{t-j} \\
+y_{t-j}
+\end{array}\right]+\left[\begin{array}{c}
+\varepsilon_{x, t} \\
+\varepsilon_{y, t}
+\end{array}\right]
+\end{aligned}
+$$
+détaillée par 
+$$
+\begin{aligned}
+\left[\begin{array}{c} x_{t} \\ y_{t} \end{array}\right] =
+& \underbrace{\left[\begin{array}{cc} 0.5 & 0.9 \\ 0 & 0.47 \end{array}\right] \left[\begin{array}{c} x_{t-1} \\ y_{t-1} \end{array}\right]}_{\text{Dépendance immédiate sur } t-1} + \underbrace{\sum_{i=2}^{5} \left[\begin{array}{cc} 0 & 0 \\ 0 & 0.06 \end{array}\right] \left[\begin{array}{c} x_{t-i} \\ y_{t-i} \end{array}\right]}_{\text{Effet de mémoire moyen terme (lags 2-5) sur } y_t} \\
+& + \underbrace{\sum_{j=6}^{22} \left[\begin{array}{cc} 0 & 0 \\ 0 & 0.01 \end{array}\right] \left[\begin{array}{c} x_{t-j} \\ y_{t-j} \end{array}\right]}_{\text{Effet de mémoire long terme (lags 6-22) sur } y_t}  + \underbrace{\left[\begin{array}{c} \varepsilon_{x, t} \\ \varepsilon_{y, t} \end{array}\right]}_{\text{Innovations}}
+\end{aligned}
+$$
+
+------------------------------------------------------------------------
+
+## Graph des séries
+
+- Données simulées
+
+```{r}
+#| echo: false
+simulate_VAR <- function(n = 1000) {
+  # Initialiser les vecteurs x et y
+  x <- numeric(n + 22)  # Besoin de 22 lags pour démarrer
+  y <- numeric(n + 22)
+  
+  # Coefficients des matrices
+  A1 <- matrix(c(0.5, 0.9, 0, 0.47), nrow = 2, byrow = TRUE)  # Lag 1
+  A2_5 <- matrix(c(0, 0, 0, 0.06), nrow = 2, byrow = TRUE)  # Lags 2 à 5
+  A6_22 <- matrix(c(0, 0, 0, 0.01), nrow = 2, byrow = TRUE)  # Lags 6 à 22
+  
+  # Génération des erreurs aléatoires
+  epsilon_x <- rnorm(n, sd=2)
+  epsilon_y <- rnorm(n)
+  
+  # Simulation
+  for (t in 23:(n + 22)) {
+    # Partie due au lag 1
+    lag1 <- A1 %*% c(x[t-1], y[t-1])
+    
+    # Partie due aux lags 2 à 5
+    lag2_5 <- rowSums(sapply(2:5, function(i) A2_5 %*% c(x[t-i], y[t-i])))
+    
+    # Partie due aux lags 6 à 22
+    lag6_22 <- rowSums(sapply(6:22, function(i) A6_22 %*% c(x[t-i], y[t-i])))
+    
+    # Ajout du bruit
+    x[t] <- lag1[1] + lag2_5[1] + lag6_22[1] + epsilon_x[t-22]
+    y[t] <- lag1[2] + lag2_5[2] + lag6_22[2] + epsilon_y[t-22]
+  }
+  
+  # Retourner uniquement les 1000 dernières valeurs (enlever la phase transitoire)
+  data.frame(x = x[23:(n+22)], y = y[23:(n+22)])
+}
+
+# Exécuter la simulation
+sim_data <- simulate_VAR()
+
+# Tracer les séries simulées
+plot(sim_data$x, type = "l", col = "blue", main = "Simulation du modèle VAR",
+     ylab = "", xlab = "")
+lines(sim_data$y, col = "red")
+legend("topright", legend = c("x", "y"), col = c("blue", "red"), lty = 1, bty = 'n')
+
+```
+
+------------------------------------------------------------------------
+
+## ACF et CCFS
+
+```{r}
+#| fig-keep: 'all'
+#| echo: false
+#| fig-height: 4
+par(mfrow = c(1, 2), mar = c(4, 4, 3, 3)) 
+acf(sim_data$x, main = "ACF de x_t")
+acf(sim_data$y, main = "ACF de y_t")
+par(mfrow = c(1, 1))
+ccf(sim_data$x, sim_data$y, main = "CCF entre x_t et y_t")
+```
+
+------------------------------------------------------------------------
+
+## Fonctions PACF
+
+### PACF
+
+```{r}
+#| echo: false
+par(mfrow=c(2,1))
+pacf(sim_data$x, main = "PACF de x_t")  
+pacf(sim_data$y, main = "PACF de y_t")  
+```
+
+------------------------------------------------------------------------
+
+# Sélection de modèle
+
+- Choisir la longueur de décalage maximale
+- Critères d'information
+$$
+\begin{array}{ll}
+\text { AIC: } & \ln |\boldsymbol{\Sigma}(P)|+k^{2} P \frac{2}{T}\\
+\text { Hannan-Quinn IC (HQIC): } & \ln |\boldsymbol{\Sigma}(P)|+k^{2} P \frac{2 \ln \ln T}{T} \\
+\text { BIC: } & \ln |\boldsymbol{\Sigma}(P)|+k^{2} P \frac{\ln T}{T}
+\end{array}
+$$
+  - $\Sigma(P)$ est la covariance des résidus en utilisant $P$ décalages
+  - $|\cdot|$ est le déterminant
+- Rapport de vraisemblance
+$$
+\left(T-P_{2} k^{2}\right)\left(\ln \left|\boldsymbol{\Sigma}\left(P_{1}\right)\right|-\ln \left|\boldsymbol{\Sigma}\left(P_{2}\right)\right|\right) \stackrel{A}{\sim} \chi_{\left(P_{2}-P_{1}\right) k^{2}}^{2}
+$$
+- Basé sur l'hypothèse de test
+  - Général à Spécifique
+  - Spécifique à Général
+
+------------------------------------------------------------------------
+
+## Sélection de la longueur de décalage dans le VAR de la Politique Monétaire
+
+- Décalage maximal : 12 (1 an)
+
+ | Longueur de décalage | AIC | HQIC | BIC | LR | P-val |
+ | :--: | :--: | :--: | :--: | :--: | :--: |
+ | 0 | 4.014 | 3.762 | 3.605 | 925 | 0.000 |
+ | 1 | 0.279 | 0.079 | $0.000^{\nabla \Delta }$ | 39.6 | 0.000 |
+ | 2 | 0.190 | 0.042 | 0.041 | 40.9 | 0.000 |
+ | 3 | 0.096 | $0.000^{\nabla}$ | 0.076 | 29.0 | 0.001 |
+ | 4 | $0.050^{\nabla}$ | 0.007 | 0.160 | 7.34 | $0.602^{\nabla}$ |
+ | 5 | 0.094 | 0.103 | 0.333 | 29.5 | 0.001 |
+ | 6 | 0.047 | 0.108 | 0.415 | 13.2 | 0.155 |
+ | 7 | 0.067 | 0.180 | 0.564 | 32.4 | 0.000 |
+ | 8 | 0.007 | $0.172^{\Delta}$ | 0.634 | 19.8 | 0.019 |
+ | 9 | $0.000^{\Delta}$ | 0.217 | 0.756 | 7.68 | $0.566^{\Delta}$ |
+ | 10 | 0.042 | 0.312 | 0.928 | 13.5 | 0.141 |
+ | 11 | 0.061 | 0.382 | 1.076 | 13.5 | 0.141 |
+ | 12 | 0.079 | 0.453 | 1.224 | - | - |
+
+------------------------------------------------------------------------
+
+# Causalité de Granger
+
+- Premier concept fondamentalement nouveau
+
+- Examine si les décalages d'une variable sont utiles pour prédire une autre
+
+## Définition (Causalité de Granger)
+
+Une variable aléatoire scalaire $\left\{x_{t}\right\}$ est dite **ne pas** causer au sens de Granger $\left\{y_{t}\right\}$ si $\mathsf{E}\left[y_{t} \mid x_{t-1}, y_{t-1}, x_{t-2}, y_{t-2}, \ldots\right]=\mathsf{E}\left[y_{t} \mid y_{t-1}, y_{t-2}, \ldots\right]$. C'est-à-dire, $\left\{x_{t}\right\}$ ne cause pas au sens de Granger si la prévision de $y_{t}$ est la même que l'on conditionne ou non sur les valeurs passées de $x_{t}$.
+
+------------------------------------------------------------------------
+
+## Causalité de Granger
+
+- Se traduit directement en une restriction dans un VAR
+- Non restreint
+
+$$
+\left[\begin{array}{l}
+x_{t} \\
+y_{t}
+\end{array}\right]=\left[\begin{array}{l}
+\phi_{01} \\
+\phi_{02}
+\end{array}\right]+\left[\begin{array}{ll}
+\phi_{11} & \phi_{12} \\
+\phi_{21} & \phi_{22}
+\end{array}\right]\left[\begin{array}{l}
+x_{t-1} \\
+y_{t-1}
+\end{array}\right]+\left[\begin{array}{l}
+\varepsilon_{1, t} \\
+\varepsilon_{2, t}
+\end{array}\right]
+$$
+
+- Restreint de sorte que $x_{t}$ ne GC pas $y_{t}$
+
+$$
+\begin{gathered}
+{\left[\begin{array}{l}
+x_{t} \\
+y_{t}
+\end{array}\right]=\left[\begin{array}{l}
+\phi_{01} \\
+\phi_{02}
+\end{array}\right]+\left[\begin{array}{ll}
+\phi_{11} & \phi_{12} \\
+0 & \phi_{22}
+\end{array}\right]\left[\begin{array}{l}
+x_{t-1} \\
+y_{t-1}
+\end{array}\right]+\left[\begin{array}{l}
+\varepsilon_{1, t} \\
+\varepsilon_{2, t}
+\end{array}\right]} \\
+x_{t}=\phi_{01}+\phi_{11} x_{t-1}+\phi_{12} y_{t-1}+\varepsilon_{1, t} \\
+y_{t}=\phi_{02}+\phi_{22} y_{t-1}+\varepsilon_{2, t} \Leftarrow \text { Pas de } x_{t}!
+\end{gathered}
+$$
+
+------------------------------------------------------------------------
+
+## VAR de Politique Monétaire -- Campbell
+
+Outil standard dans l'analyse de la politique monétaire
+
+- Taux de chômage (différencié)
+- Taux des fonds fédéraux
+- Taux d'inflation (différencié)
+
+$$
+\left[\begin{array}{c}
+\Delta \mathrm{UNEMP}_{t} \\
+\mathrm{FF}_{t} \\
+\Delta \mathrm{INF}_{t}
+\end{array}\right]=\Phi_{0}+\Phi_{1}\left[\begin{array}{c}
+\Delta \mathrm{UNEMP}_{t-1} \\
+\mathrm{FF}_{t-1} \\
+\Delta \mathrm{INF}_{t-1}
+\end{array}\right]+\left[\begin{array}{c}
+\varepsilon_{1, t} \\
+\varepsilon_{2, t} \\
+\varepsilon_{3, t}
+\end{array}\right]
+$$
+
+------------------------------------------------------------------------
+
+## Causalité de Granger dans le VAR de Campbell
+
+- Utiliser le modèle avec 3 décalages (HQIC)
+- $H_{0}: \phi_{i j, 1}=\phi_{i j, 2}=\phi_{i j, 3}=0$
+- $H_{1}: \phi_{i j, 1} \neq 0$ ou $\phi_{i j, 2} \neq 0$ ou $\phi_{i j, 3} \neq 0$
+- $i$ représente la série affectée par les décalages de la série $j$
+
+::: {.xsmall}
+ |  | Taux des fonds fédéraux |  | Inflation |  | Chômage |  |
+ | :--: | :--: | :--: | :--: | :--: | :--: | :--: |
+ | Exclusion | P-val | Stat | P-val | Stat | P-val | Stat |
+ | Taux des fonds fédéraux | - | - | 0.001 | 13.068 | 0.014 | 8.560 |
+ | Inflation | 0.001 | 14.756 | - | - | 0.375 | 1.963 |
+ | Chômage | 0.000 | 19.586 | 0.775 | 0.509 | - | - |
+ | Tous | 0.000 | 33.139 | 0.000 | 18.630 | 0.005 | 10.472 |
+\normalsize
+:::
+
+------------------------------------------------------------------------
+
+# Fonctions de réponse impulsionnelle
+
+- Deuxième concept fondamentalement nouveau
+
+- La dynamique complexe d'un VAR rend l'interprétation directe des coefficients difficile
+
+- La solution est d'examiner les réponses impulsionnelles
+
+- La fonction de réponse impulsionnelle de $y_{i}$ par rapport à un choc dans $\varepsilon_{j}$, pour tout $j$ et $i$, est définie comme le changement dans $y_{i t+s}, s \geq 0$ pour un choc unitaire dans $\varepsilon_{j t}$
+  - Difficile à déchiffrer
+  
+- Tant que $\mathbf{y}_{t}$ est stationnaire en covariance, il doit avoir une représentation VMA,
+$$
+\mathbf{y}_{t}=\boldsymbol{\mu}+\boldsymbol{\varepsilon}_{t}+\boldsymbol{\Xi}_{1} \boldsymbol{\varepsilon}_{t-1}+\boldsymbol{\Xi}_{2} \boldsymbol{\varepsilon}_{t-2}+\ldots
+$$
+
+- $\boldsymbol{\Xi}_{j}$ sont les réponses impulsionnelles !
+
+- Pourquoi ?
+  - Mesurent directement l'effet dans la période $j$ de tout choc
+
+------------------------------------------------------------------------
+
+## AP(P) et MA($\infty$)
+
+- Tout $\operatorname{AR}(P)$ stationnaire
+$$
+y_{t}=\phi_{0}+\phi_{1} y_{t-1}+\phi_{2} y_{t-2}+\ldots+\phi_{P} y_{t-P}+\varepsilon_{t}
+$$
+peut être représenté comme un MA($\infty$)
+$$
+y_{t}=\phi_{0} /\left(1-\phi_{1}-\phi_{2}-\ldots-\phi_{P}\right)+\varepsilon_{t}+\sum_{i=1}^{\infty} \phi_{i} \varepsilon_{t-i}
+$$
+- $\operatorname{AR}(1)$
+$$
+y_{t}=\phi_{0}+\phi_{1} y_{t-1}+\varepsilon_{t}
+$$
+devient
+$$
+y_{t}=\phi_{0} /\left(1-\phi_{1}\right)+\varepsilon_{t}+\sum_{i=1}^{\infty} \phi_{1}^{i} \varepsilon_{t-i}
+$$
+- Les VAR(P) stationnaires ont la même relation avec $\operatorname{VMA}(\infty)$
+$$
+\begin{aligned}
+\mathbf{y}_{t}&=\Phi_{0}+\Phi_{1} \mathbf{y}_{t-1}+\Phi_{2} \mathbf{y}_{t-2}+\ldots+\Phi_{P} \mathbf{y}_{t-P}+\boldsymbol{\varepsilon}_{t} \\
+&\\
+\mathbf{y}_{t}&=\boldsymbol{\mu}+\boldsymbol{\varepsilon}_{t}+\boldsymbol{\Xi}_{1} \boldsymbol{\varepsilon}_{t-1}+\boldsymbol{\Xi}_{2} \boldsymbol{\varepsilon}_{t-2}+\ldots
+\end{aligned}
+$$
+
+------------------------------------------------------------------------
+
+## Résolution IR
+
+- Facile dans VAR(1)
+
+$$
+y_{t}=\left(\mathbf{I}_{K}-\Phi_{1}\right)^{-1} \Phi_{0}+\varepsilon_{t}+\Phi_{1} \varepsilon_{t-1}+\Phi_{1}^{2} \varepsilon_{t-2}+\ldots
+$$
+
+- $\Xi_{j}=\Phi_{1}^{j}$
+- Dans le VAR(P) général,
+
+$$
+\Xi_{j}=\Phi_{1} \Xi_{j-1}+\Phi_{2} \Xi_{j-2}+\ldots+\Phi_{P} \Xi_{j-P}
+$$
+où $\Xi_{0}=\mathbf{I}_{k}$ et $\Xi_{m}=0$ pour $m<0$.
+
+  - Dans un VAR(2),
+$$
+\begin{gathered}
+y_{t}=\Phi_{1} y_{t-1}+\Phi_{2} y_{t-2}+\varepsilon_{t} \\
+-\Xi_{0}=\mathbf{I}_{k}, \Xi_{1}=\Phi_{1}, \Xi_{2}=\Phi_{1}^{2}+\Phi_{2}, \text { et } \Xi_{3}=\Phi_{1}^{3}+\Phi_{1} \Phi_{2}+\Phi_{2} \Phi_{1}
+\end{gathered}
+$$
+
+- Les intervalles de confiance sont également assez compliqués
+
+------------------------------------------------------------------------
+
+## Considérations pour les chocs
+
+- VAR bivariée simple d'ordre 1
+
+$$
+\left[\begin{array}{l}
+x_{t} \\
+y_{t}
+\end{array}\right]=\left[\begin{array}{l}
+\phi_{01} \\
+\phi_{02}
+\end{array}\right]+\left[\begin{array}{ll}
+\phi_{11} & \phi_{12} \\
+\phi_{21} & \phi_{22}
+\end{array}\right]\left[\begin{array}{l}
+x_{t-1} \\
+y_{t-1}
+\end{array}\right]+\left[\begin{array}{l}
+\varepsilon_{1, t} \\
+\varepsilon_{2, t}
+\end{array}\right]
+$$
+
+- La manière dont vous choquez importe
+- Dépend de la corrélation entre $\varepsilon_{1, t}$ et $\varepsilon_{2, t}$
+- 3 méthodes
+
+  - Ignorer la corrélation et choquer simplement $\varepsilon_{j, t}$ avec un choc d'écart-type unitaire
+  - Utiliser Cholesky pour factoriser $\Sigma$ et utiliser $\Sigma^{1 / 2} \mathbf{e}_{j}$ où $\mathbf{e}_{j}$ est un vecteur de zéros avec 1 dans la $j^{\text {ème }}$ position
+  $$
+  \boldsymbol{\Sigma}=\left[\begin{array}{cc}
+  1 & .5 \\
+  .5 & 1
+  \end{array}\right] \quad \boldsymbol{\Sigma}_{C}^{1 / 2}=\left[\begin{array}{cc}
+  1 & 0 \\
+  .5 & .866
+  \end{array}\right]
+  $$
+    - L'ordre des variables importe
+    
+  - "Réponse impulsionnelle généralisée" qui utilise une méthode de projection
+
+------------------------------------------------------------------------
+
+## Exemple des différents chocs
+
+- Définir la covariance des erreurs
+
+$$
+\boldsymbol{\Sigma}=\left[\begin{array}{cc}
+\sigma_{x}^{2} & \sigma_{x} \sigma_{y} \rho \\
+\sigma_{x} \sigma_{y} \rho & \sigma_{y}^{2}
+\end{array}\right]
+$$
+
+- Standardisé
+
+$$
+\left[\begin{array}{c}
+\sigma_{x} \\
+0
+\end{array}\right] \text { et }\left[\begin{array}{c}
+0 \\
+\sigma_{y}
+\end{array}\right]
+$$
+
+- Cholesky
+
+$$
+\begin{gathered}
+\boldsymbol{\Sigma}_{C}^{1 / 2}\left[\begin{array}{l}
+0 \\
+1
+\end{array}\right]=\left[\begin{array}{cc}
+\sigma_{x} & 0 \\
+\sigma_{y} \rho & \sigma_{y} \sqrt{1-\rho^{2}}
+\end{array}\right]\left[\begin{array}{l}
+0 \\
+1
+\end{array}\right]=\left[\begin{array}{c}
+0 \\
+\sigma_{y} \sqrt{1-\rho^{2}}
+\end{array}\right] \\
+{\left[\begin{array}{cc}
+\sigma_{x} & 0 \\
+\sigma_{y} \rho & \sigma_{y} \sqrt{1-\rho^{2}}
+\end{array}\right]\left[\begin{array}{l}
+1 \\
+0
+\end{array}\right]=\left[\begin{array}{c}
+\sigma_{x} \\
+\sigma_{y} \rho
+\end{array}\right], \text { autre est }\left[\begin{array}{c}
+0 \\
+\sigma_{y} \sqrt{1-\rho^{2}}
+\end{array}\right]}
+\end{gathered}
+$$
+
+------------------------------------------------------------------------
+
+## Réponses impulsionnelles
+
+- Taux des fonds fédéraux ordonné en premier
+- Réponse à un choc des fonds fédéraux
+- Factorisation de Cholesky
+
+```{r}
+#| label: IRF-simule
+#| fig-width: 11
+#| fig-height: 4
+# Sur le VAR simulé des slides précédentes : aucune dépendance à une API externe.
+var_sim <- VAR(sim_data, p = 1, type = "const")
+
+irf_x_x <- irf(var_sim, impulse = "x", response = "x", n.ahead = 20, boot = TRUE)
+irf_x_y <- irf(var_sim, impulse = "x", response = "y", n.ahead = 20, boot = TRUE)
+irf_y_x <- irf(var_sim, impulse = "y", response = "x", n.ahead = 20, boot = TRUE)
+
+par(mfrow = c(1, 3))
+plot(irf_x_x, main = "Choc sur x -> x")
+plot(irf_x_y, main = "Choc sur x -> y")
+plot(irf_y_x, main = "Choc sur y -> x")
+par(mfrow = c(1, 1))
+```
+
+Le troisième graphique est le plus instructif : dans la matrice de simulation,
+$x$ n'est pas influencé par $y$. La réponse est donc nulle — et elle le reste si
+l'on inverse l'ordre de Cholesky, puisqu'ici la contrainte vient du modèle, pas
+de l'identification.

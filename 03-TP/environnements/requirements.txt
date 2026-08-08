@@ -1,0 +1,29 @@
+# Économétrie des séries temporelles — M1 MBFA
+# Environnement Python.  Installation :  pip install -r requirements.txt
+#
+# Sur Google Colab, seuls `arch` et `pmdarima` manquent :
+#     !pip install arch pmdarima
+
+numpy>=1.24
+pandas>=2.0
+matplotlib>=3.7
+scipy>=1.10
+
+# Cœur économétrique : ARIMA, VAR, VECM, Johansen, tests de diagnostic
+statsmodels>=0.14
+
+# Racines unitaires (ADF, DF-GLS, Phillips-Perron, KPSS, Zivot-Andrews)
+# et modèles de volatilité
+arch>=6.2
+
+# Équivalent de forecast::auto.arima
+# Version épinglée : ce paquet a déjà connu des ruptures de compatibilité
+# avec numpy et statsmodels en amont.
+pmdarima>=2.0,<3.0
+
+# Données externes (FRED, Yahoo Finance)
+pandas-datareader>=0.10
+yfinance>=0.2
+
+# Notebooks
+jupyter>=1.0

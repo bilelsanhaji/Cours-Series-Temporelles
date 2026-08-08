@@ -1,0 +1,216 @@
+---
+title: "Rappels et révisions"
+subtitle: "Économétrie des séries temporelles · M1 MBFA"
+# Configuration commune (thème, tableau blanc, découpage) : _quarto.yml à la racine
+format:
+  revealjs:
+    footer: "Économétrie des séries temporelles — Rappels"
+---
+
+<!-- Version étudiante : engendrée automatiquement depuis la source
+     enseignante par 01-Slides/generer-version-etudiant.R.
+     Ne pas modifier ici — les changements seraient écrasés. -->
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(
+  #eval = FALSE,
+  echo = FALSE,
+  error = TRUE,
+  fig.width = 10, 
+  fig.height = 5,
+  dpi = 192,
+  fig.keep ="last",
+  message = FALSE,
+  warning = FALSE,
+  results = "markup"
+)
+```
+
+```{r}
+#| echo: false
+library(quantmod)
+library(fredr)
+fredr_set_key(Sys.getenv("FRED_API_KEY"))
+library(vars)
+library(forecast)
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+library(urca)
+library(astsa)
+library(aTSA)
+library(forecast)
+library(ppcor)
+library(MASS)
+```
+
+------------------------------------------------------------------------
+
+# Concepts : 
+
+## **Méthode Box-Jenkins**
+
+## **Stabilité**
+
+## **Inversibilité**
+
+## **Analyse des racines**
+
+## **Autocovariances et Autocorrélations**
+
+------------------------------------------------------------------------
+
+## **Différence Clé entre Stabilité et Inversibilité**
+
+- **Stabilité** : Concerne les **modèles AR** et garantit que le processus ne diverge pas (pas de racines unitaires ou explosives).
+- **Inversibilité** : Concerne les **modèles MA** et garantit que le processus peut être représenté de manière unique comme un AR($\infty$).
+
+## **Pourquoi ces Concepts sont Importants ?**
+
+- **Stabilité** :  
+  - Un processus AR stable est **stationnaire**.  
+  - Les prévisions sont fiables et convergent vers une valeur à long terme.
+
+- **Inversibilité** :  
+  - Un processus MA inversible peut être **représenté de manière unique**.  
+  - Évite les ambiguïtés dans l'interprétation des coefficients MA.
+
+## **Exemple Pratique** ARMA(1,1) :
+
+$$Y_t = 0.8 Y_{t-1} + 0.5 \varepsilon_{t-1} + \varepsilon_t$$
+
+- **Partie AR** :  
+  - Équation caractéristique : $z - 0.8 = 0$.  
+  - Racine : $z = 1.25$ ($|z| > 1$).  
+  - **Stable**.
+
+- **Partie MA** :  
+  - Équation caractéristique : $1 - 0.5 z = 0$.  
+  - Racine : $z = 2$ ($|z| > 1$).  
+  - **Inversible**.
+
+------------------------------------------------------------------------
+
+# Processus ARMA et Analyse des Racines
+
+## Équation Caractéristique
+
+Un processus AR(p) s'écrit :
+$$
+Y_t = \phi_1 Y_{t-1} + \phi_2 Y_{t-2} + \dots + \phi_p Y_{t-p} + \varepsilon_t.
+$$
+
+En utilisant l'opérateur de retard $L$, cela devient :
+$$
+Y_t = \phi_1 L Y_t + \phi_2 L^2 Y_t + \dots + \phi_p L^p Y_t + \varepsilon_t.
+$$
+
+On peut regrouper les termes en $Y_t$ :
+$$
+Y_t - \phi_1 L Y_t - \phi_2 L^2 Y_t - \dots - \phi_p L^p Y_t = \varepsilon_t.
+$$
+
+Cela se réécrit sous forme polynomiale :
+$$
+(1 - \phi_1 L - \phi_2 L^2 - \dots - \phi_p L^p) Y_t = \varepsilon_t.
+$$
+
+l'**équation caractéristique** est :
+$$
+z^p - \phi_1 z^{p-1} - \phi_2 z^{p-2} - \dots - \phi_p = 0.
+$$
+
+------------------------------------------------------------------------
+
+## Calcul des Racines
+- **Racines réelles** : Si le discriminant $\Delta = b^2 - 4ac \geq 0$, les racines sont réelles :
+  $$
+  z = \frac{-b \pm \sqrt{\Delta}}{2a}.
+  $$
+
+- **Racines complexes** : Si $\Delta < 0$, les racines sont complexes conjuguées :
+  $$
+  z = \frac{-b \pm i \sqrt{|\Delta|}}{2a}.
+  $$
+
+## Module des Racines
+Pour une racine complexe $z = a + ib$, le module est :
+$$
+|z| = \sqrt{a^2 + b^2}.
+$$
+
+## Classification des Processus
+- **Convergent (Stable)** : Toutes les racines ont $|z| < 1$.
+
+- **Explosif** : Au moins une racine a $|z| > 1$.
+
+- **Métastable** : Au moins une racine a $|z| = 1$.
+
+------------------------------------------------------------------------
+
+## A Retenir
+- **Stabilité** : Vérifiez toujours $|z| < 1$ pour la convergence.
+- **Racines complexes** : Leur module détermine la stabilité.
+- **Métastable** : Rare en pratique, mais important à reconnaître.
+
+## Formules Utiles
+- **Discriminant** : $\Delta = b^2 - 4ac$.
+- **Module** : $|z| = \sqrt{a^2 + b^2}$.
+- **Racines complexes** : $z = \frac{-b \pm i \sqrt{|\Delta|}}{2a}$.
+- **Racines réelles** : $z = \frac{-b \pm \sqrt{\Delta}}{2a}$.
+
+------------------------------------------------------------------------
+
+## Synthèse des Processus AR/ARMA et leurs Racines Caractéristiques
+
+::: {.xxsmall}
+
+| **Processus**            | **Équation**                          | **Racines Caractéristiques**       | **Module**         | **Comportement**       |
+|--------------------|-----------------------------------------------|---------------------------------|--------------------------|-------------------------|
+| **AR(1) Stable**         | $Y_t = 0.6 Y_{t-1} + \varepsilon_t$ | $z = 0.6$                        | $\lvert z\rvert  = 0.6 < 1$  | Convergent (Stable)    |
+| **AR(1) Instable**       | $Y_t = 1.2 Y_{t-1} + \varepsilon_t$ | $z = 1.2$                        | $\lvert z\rvert  = 1.2 > 1$  | Explosif (Instable)    |
+| **AR(1) Métastable**     | $Y_t = Y_{t-1} + \varepsilon_t$     | $z = 1$                          | $\lvert z\rvert  = 1$        | Métastable            |
+| **AR(2) Racines Réelles**| $Y_t = 0.6 Y_{t-1} + 0.3 Y_{t-2} + \varepsilon_t$ | $z_1 \approx 0.92$, $z_2 \approx -0.32$ | $\lvert z_1\rvert  \approx 0.92$, $\lvert z_2\rvert  \approx 0.32$ | Convergent (Stable)    |
+| **AR(2) Racines Complexes** | $Y_t = -0.5 Y_{t-1} - 0.4 Y_{t-2} + \varepsilon_t$ | $z = -0.25 \pm 0.58i$ | $\lvert z\rvert  \approx 0.63$ | Convergent (Stable)    |
+| **AR(2) Racine Double**  | $Y_t = 1.0 Y_{t-1} - 0.25 Y_{t-2} + \varepsilon_t$ | $z = 0.5$ (double) | $\lvert z\rvert  = 0.5 < 1$  | Convergent (Stable)    |
+| **AR(2) Racine Unitaire**| $Y_t = 1.5 Y_{t-1} - 0.5 Y_{t-2} + \varepsilon_t$ | $z_1 = 1$, $z_2 = 0.5$ | $\lvert z_1\rvert  = 1$, $\lvert z_2\rvert  = 0.5$ | Métastable            |
+| **AR(2) Instable**       | $Y_t = 1.2 Y_{t-1} + 0.3 Y_{t-2} + \varepsilon_t$ | $z_1 \approx 1.41$, $z_2 \approx -0.21$ | $\lvert z_1\rvert  \approx 1.41 > 1$, $\lvert z_2\rvert  \approx 0.21 < 1$ | Explosif (Instable)    |
+| **MA(1)**                | $Y_t = \varepsilon_t + 0.5 \varepsilon_{t-1}$      | Pas de racines AR                  | -                  | Toujours Stationnaire  |
+| **ARMA(1,1)**            | $Y_t = 0.8 Y_{t-1} + \varepsilon_t + 0.5 \varepsilon_{t-1}$ | $z = 0.8$ (partie AR) | $\lvert z\rvert  = 0.8 < 1$  | Convergent (Stable)    |
+
+\normalsize
+:::
+
+------------------------------------------------------------------------
+
+# Comportement de l'ACF et de la PACF pour divers membres de la famille ARMA.
+
+::: {.xsmall}
+
+| Processus       | ACF                                                                 | PACF                                                                 |
+|-----------------|---------------------------------------------------------------------|---------------------------------------------------------------------|
+| Bruit Blanc   | Tous à 0                                                            | Tous à 0                                                            |
+| AR(1)         | $\rho_s = \phi_s$                                                    | 0 au-delà du décalage 2                                             |
+| AR(P)         | Décroît vers zéro de manière exponentielle                           | Non nuls jusqu'au décalage P, 0 ensuite                             |
+| MA(1)         | $\rho_1 \neq 0$, $\rho_s = 0$, $s > 1$                             | Décroît vers zéro de manière exponentielle                          |
+| MA(Q)         | Non nuls jusqu'au décalage Q, 0 ensuite                             | Décroît vers zéro de manière exponentielle                          |
+| ARMA(P,Q)     | Décroissance exponentielle                                          | Décroissance exponentielle                                          |
+
+\normalsize
+:::
+
+------------------------------------------------------------------------
+
+# Annexes : Calcul de l'Autocovariance et des Autocorrélations
+
+**Les annexes sont disponibles avec les deux approches suivantes :**
+
+## A.1 Équations de Yule-Walker
+## A.2 Substitution rétroactive
+
+------------------------------------------------------------------------
+
+# Examen
+
+La matitrise intégrale du cours est demandée.

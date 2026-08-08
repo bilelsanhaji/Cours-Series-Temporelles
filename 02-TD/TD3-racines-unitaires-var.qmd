@@ -50,13 +50,13 @@ plot(z, type = "l", main = "c.")
 
 On souhaite étudier les interactions entre trois variables macroéconomiques : 
 
-1. **PIB**, noté \( y_t \),
-2. **Taux d'inflation**, noté \( \pi_t \),
-3. **Taux d'intérêt**, noté \( r_t \).
+1. **PIB**, noté $y_t$,
+2. **Taux d'inflation**, noté $\pi_t$,
+3. **Taux d'intérêt**, noté $r_t$.
 
 On suppose que ces variables suivent un modèle VAR(2) de la forme :
 
-\[
+$$
 \begin{pmatrix}
 y_t \\
 \pi_t \\
@@ -96,10 +96,10 @@ r_{t-2}
 \varepsilon_{2t} \\
 \varepsilon_{3t}
 \end{pmatrix}
-\]
+$$
 
-où \( \varepsilon_t = (\varepsilon_{1t}, \varepsilon_{2t}, \varepsilon_{3t})' \) est un 
-vecteur de bruits blancs tels que \( \mathsf{E}[\boldsymbol{\varepsilon}_t] = \mathbf{0} \) et \( \mathsf{E}[\varepsilon_t \varepsilon_t'] = \boldsymbol{\Sigma} \), avec \( \boldsymbol{\Sigma} \) une matrice de variance-covariance.
+où $\varepsilon_t = (\varepsilon_{1t}, \varepsilon_{2t}, \varepsilon_{3t})'$ est un 
+vecteur de bruits blancs tels que $\mathsf{E}[\boldsymbol{\varepsilon}_t] = \mathbf{0}$ et $\mathsf{E}[\varepsilon_t \varepsilon_t'] = \boldsymbol{\Sigma}$, avec $\boldsymbol{\Sigma}$ une matrice de variance-covariance.
 
-a. Écrivez explicitement les trois équations du modèle VAR(2) pour \( y_t \), \( \pi_t \) et \( r_t \).
-b. Quelle est la signification économique des coefficients \( \phi_{12}^1 \) et \( \phi_{23}^2 \) ?
+a. Écrivez explicitement les trois équations du modèle VAR(2) pour $y_t$, $\pi_t$ et $r_t$.
+b. Quelle est la signification économique des coefficients $\phi_{12}^1$ et $\phi_{23}^2$ ?

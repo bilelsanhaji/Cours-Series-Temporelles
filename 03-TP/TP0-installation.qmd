@@ -1,0 +1,177 @@
+---
+title: "Économétrie des Séries Temporelles"
+author: "Fiche TP #0 — Installation"
+date: "À faire **avant** la première séance"
+format: pdf
+---
+
+# Ce qui est attendu
+
+Vous arrivez en séance 1 avec un environnement qui **fonctionne**. La séance
+sert à vérifier, pas à installer. Les années précédentes, trois à quatre séances
+ont été perdues sur des problèmes de mise en route : cette année, le format ne le
+permet plus.
+
+Vous travaillez **en `R` ou en `Python`, au choix**. Le choix est libre, il
+n'a aucune conséquence sur la notation, et vous pouvez en changer en cours de
+semestre. Installez celui que vous connaissez le mieux.
+
+**Si quoi que ce soit résiste : n'installez rien de plus, passez à la solution
+en ligne** (§3). Elle ne demande aucune installation et suffit pour tout le
+semestre.
+
+---
+
+# 1. Voie `R`
+
+## Installation
+
+1. [R](https://cran.r-project.org/) — version 4.2 ou plus récente
+2. [RStudio Desktop](https://posit.co/download/rstudio-desktop/)
+3. Quarto est inclus dans les versions récentes de RStudio. Sinon :
+   [quarto.org](https://quarto.org/docs/get-started/)
+
+## Paquets
+
+Dans la console `R`, depuis le dossier du cours :
+
+```r
+source("install-packages.R")
+```
+
+Le script n'installe que ce qui manque et laisse le reste tranquille.
+
+## Vérification
+
+Copiez ces lignes dans la console. Les trois doivent s'exécuter sans erreur.
+
+```r
+library(readr); library(tseries); library(forecast); library(vars)
+
+x <- arima.sim(list(ar = 0.6), n = 200)      # 1. simulation
+plot(x, main = "AR(1), phi = 0.6")            # 2. graphique
+adf.test(x)                                   # 3. test
+```
+
+---
+
+# 2. Voie `Python`
+
+## Installation
+
+1. [Python](https://www.python.org/downloads/) 3.10 ou plus récent, ou
+   [Anaconda](https://www.anaconda.com/download) qui embarque tout
+2. Un éditeur : VS Code, JupyterLab ou Positron
+
+## Paquets
+
+```bash
+pip install -r 03-TP/environnements/requirements.txt
+```
+
+## Vérification
+
+```python
+import numpy as np, matplotlib.pyplot as plt
+from statsmodels.tsa.arima_process import ArmaProcess
+from arch.unitroot import ADF
+
+x = ArmaProcess(ar=[1, -0.6], ma=[1]).generate_sample(200)   # 1. simulation
+fig, ax = plt.subplots(); ax.plot(x); plt.show()             # 2. graphique
+print(ADF(x))                                                # 3. test
+```
+
+---
+
+# 3. Si rien ne marche : la voie en ligne
+
+Aucune installation, rien à configurer, accessible depuis n'importe quel poste.
+**C'est une solution parfaitement acceptable pour tout le semestre**, y compris
+pour les TP notés.
+
+| | |
+|---|---|
+| `R` | [Posit Cloud](https://posit.cloud/) — compte gratuit, importer le projet depuis GitHub |
+| `Python` | [Google Colab](https://colab.research.google.com/) — un compte Google suffit |
+
+Sur Colab, la plupart des paquets sont déjà présents. Il ne manque en général
+que celui-ci, à installer en tête de notebook :
+
+```python
+!pip install arch pmdarima
+```
+
+---
+
+# 4. Récupérer le cours
+
+```bash
+git clone https://github.com/bilelsanhaji/Cours-Series-Temporelles.git
+cd Cours-Series-Temporelles
+```
+
+Puis, au fil du semestre :
+
+```bash
+git pull
+```
+
+Sans `git`, le bouton **Code → Download ZIP** de la page GitHub fait l'affaire —
+mais il faudra le refaire à chaque mise à jour.
+
+---
+
+# 5. Charger les données
+
+Les fiches de TP chargent les séries **par URL** depuis le dépôt : elles
+fonctionnent donc sans clone préalable, y compris sur Colab et Posit Cloud.
+
+::: {.panel-tabset}
+
+### `R`
+
+```r
+library(readr)
+url <- paste0("https://raw.githubusercontent.com/bilelsanhaji/",
+              "Cours-Series-Temporelles/refs/heads/main/04-Data/SH_MIN006088001.csv")
+nice <- read_delim(url, delim = ";", comment = "#", trim_ws = TRUE,
+                   col_types = cols(YYYYMM = col_date(format = "%Y%m")))
+head(nice)
+```
+
+### `Python`
+
+```python
+import pandas as pd
+url = ("https://raw.githubusercontent.com/bilelsanhaji/"
+       "Cours-Series-Temporelles/refs/heads/main/04-Data/SH_MIN006088001.csv")
+nice = pd.read_csv(url, sep=";", comment="#")
+nice["YYYYMM"] = pd.to_datetime(nice["YYYYMM"], format="%Y%m")
+nice.head()
+```
+
+:::
+
+En cas de coupure réseau, les mêmes fichiers sont dans `04-Data/` : remplacez
+l'URL par le chemin relatif `../04-Data/SH_MIN006088001.csv`.
+
+---
+
+# 6. Check-list
+
+Cochez avant la séance 1. Si une case résiste, passez à la voie en ligne (§3)
+plutôt que de vous acharner.
+
+- [ ] Le langage choisi est installé et démarre
+- [ ] Les trois lignes de vérification s'exécutent sans erreur
+- [ ] Le dépôt du cours est sur ma machine (ou ouvert sur Posit Cloud / Colab)
+- [ ] Je charge la série de Nice et j'en affiche les premières lignes
+- [ ] J'affiche un graphique
+- [ ] **Une solution de repli est prête** au cas où ma machine me lâche le jour
+      d'un TP noté
+
+---
+
+> **Rappel.** Trois TP sont notés (séances 7, 9 et 11) et se font sur machine en
+> séance. Un environnement qui ne démarre pas ce jour-là vous coûte des points.
+> Testez la voie de repli **une fois**, maintenant, pour savoir qu'elle marche.

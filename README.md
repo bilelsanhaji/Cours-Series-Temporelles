@@ -20,12 +20,28 @@ Le fil des chapitres :
 | **1** | Introduction et concepts essentiels | Caractériser un processus stochastique, lire une ACF |
 | **2** | Processus ARMA stationnaires | Identifier, estimer et valider un ARMA |
 | **3** | Racines unitaires | Tester la non-stationnarité, choisir la spécification du test |
-| **4** | Séries temporelles multivariées | Estimer un VAR, tester Granger, lire une IRF, traiter la cointégration |
-| **5** | Modèles univariés non linéaires | Situer les modèles à seuil et à transition lisse |
+| **4** | Séries temporelles multivariées | Estimer un VAR, tester Granger, lire une IRF |
+| **5** | Cointégration et correction d'erreur | Reconnaître une relation de long terme, situer un VECM |
+| **6** | Ouverture : modèles non linéaires | Situer les modèles à changement de régime |
 
 Les objectifs sont formulés en termes de pratique : lire un article empirique
 en macroéconomie ou en finance, **reproduire** son analyse, la critiquer, puis
 produire son propre travail empirique.
+
+**Format 2026/2027 : 11 séances de 3 × 50 min**, environ moitié cours magistral,
+moitié travaux dirigés et travaux sur machine, dans la même séance.
+
+---
+
+## `R` ou `Python`, au choix
+
+Les travaux sur machine se font dans le langage de votre choix. **Les deux sont
+pris en charge à parité** : chaque fiche de TP a un corrigé dans chaque langage,
+et `03-TP/correspondance-R-python.md` donne, fonction par fonction, l'équivalence
+entre les deux écosystèmes.
+
+Le choix est libre, réversible en cours de semestre, et sans aucune incidence sur
+la notation.
 
 ---
 
@@ -36,12 +52,14 @@ produire son propre travail empirique.
 | `00-Syllabus/` | Chapitre 0 : présentation générale, plan, objectifs, évaluation |
 | `01-Slides/` | Les chapitres du cours magistral (Quarto → reveal.js) |
 | `01-Slides/notes/` | Notes de cours détaillées : calcul des autocovariances, stationnarité des AR |
+| `01-Slides/extraits/` | Slides retirées du cours et versées aux fiches de TP |
 | `02-TD/` | Les fiches de travaux dirigés (exercices sur papier) |
-| `03-TP/` | Les fiches `R` (travail sur machine) |
+| `03-TP/` | Les fiches de travaux sur machine, `R` et `Python` |
 | `04-Data/` | Les séries utilisées en TD et en TP |
-| `05-Eval/` | Sujets d'examen, sujet de projet, articles de référence |
-| `06-Enseignant/` | Déroulé des séances, notes de préparation |
-| `99-Archive/` | Sources `.Rmd` d'origine et versions antérieures |
+| `05-Eval/` | Sujets de partiel, sujets des TP notés, articles de référence |
+| `05-Eval/tp-notes/` | Les trois TP notés et leur mode d'emploi |
+| `06-Enseignant/` | Déroulé des séances, plan de refonte, notes de préparation |
+| `99-Archive/` | Sources d'origine et versions antérieures du cours |
 
 Les corrigés sont dans `02-TD/corriges/` et `03-TP/corriges/`, et sont déposés
 après chaque séance.
@@ -152,14 +170,26 @@ mise en forme est dans `01-Slides/README.md`.
 
 ## Évaluation
 
-| Composante | Poids |
-|---|---|
-| Examen final sur table (CM) | 60 % |
-| Projet individuel (TD) | 40 % |
+| Composante | Poids | Modalité |
+|---|---|---|
+| Partiel final sur table | 60 % | 2 h, sans document |
+| Trois TP notés sur machine | 40 % | Séances 7, 9 et 11, en séance, individuels |
 
-Le projet se fait **en `R`** : le code doit être compris, exécutable et
-documenté, avec citation des sources originales des méthodes employées. Le sujet
-et les attendus sont dans `05-Eval/projet/`.
+**Chaque étudiant travaille sur sa propre série** — une station météo différente
+par étudiant, parmi les 27 de `04-Data/SH_IN_metropole/`. Les trois TP notés
+portent sur cette même série, ce qui permet de se concentrer sur la méthode
+plutôt que sur la découverte des données.
+
+Ce qui est noté est la **démarche** et l'**interprétation**, pas la sortie brute.
+Un résultat gênant correctement discuté vaut mieux qu'un résultat propre laissé
+sans commentaire.
+
+L'usage d'une assistance par IA est autorisé pendant les TP notés. Il ne présente
+simplement aucun intérêt pour la partie qui compte : personne ne peut produire
+vos chiffres ni les interpréter à votre place.
+
+Les sujets, le mode d'emploi et le script d'attribution des stations sont dans
+`05-Eval/tp-notes/`.
 
 ---
 

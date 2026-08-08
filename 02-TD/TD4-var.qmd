@@ -1,0 +1,99 @@
+---
+title: "Économétrie des Séries Temporelles"
+author: "Fiche TD #4"
+date: "Modèles VAR — causalité de Granger et réponses impulsionnelles"
+format: pdf
+---
+
+*Séance 10. Cette fiche prépare le TP noté n°3 de la séance 11.*
+
+### Exercice 1 — Écriture et stationnarité
+
+On étudie les interactions entre trois variables macroéconomiques : le PIB
+$y_t$, le taux d'inflation $\pi_t$ et le taux d'intérêt $r_t$, supposées suivre
+un VAR(2) :
+
+$$
+\begin{pmatrix} y_t \\ \pi_t \\ r_t \end{pmatrix}
+= \mathbf{c}
++ \boldsymbol{\Phi}_1 \begin{pmatrix} y_{t-1} \\ \pi_{t-1} \\ r_{t-1} \end{pmatrix}
++ \boldsymbol{\Phi}_2 \begin{pmatrix} y_{t-2} \\ \pi_{t-2} \\ r_{t-2} \end{pmatrix}
++ \boldsymbol{\varepsilon}_t
+$$
+
+avec $\mathsf{E}[\boldsymbol{\varepsilon}_t] = \mathbf{0}$ et
+$\mathsf{E}[\boldsymbol{\varepsilon}_t \boldsymbol{\varepsilon}_t'] = \boldsymbol{\Sigma}$.
+
+  (a) Écrivez explicitement les trois équations du système.
+  (b) Quelle est la signification économique des coefficients $\phi_{12}^{1}$ et
+      $\phi_{23}^{2}$ ?
+  (c) Combien de paramètres faut-il estimer en tout ? Que se passe-t-il si l'on
+      ajoute une quatrième variable ? Commentez le compromis entre richesse du
+      modèle et nombre d'observations disponibles.
+
+<br> \bigskip
+
+### Exercice 2 — Condition de stabilité
+
+Soit le VAR(1) bivarié $\mathbf{y}_t = \boldsymbol{\Phi} \mathbf{y}_{t-1} + \boldsymbol{\varepsilon}_t$ avec
+
+$$
+\boldsymbol{\Phi} = \begin{pmatrix} 0.5 & 0.2 \\ 0.3 & 0.4 \end{pmatrix}
+$$
+
+  (a) Écrivez les deux équations du système.
+  (b) Calculez les valeurs propres de $\boldsymbol{\Phi}$.
+  (c) Le système est-il stable ? Énoncez la condition et vérifiez-la.
+  (d) Reprenez avec $\boldsymbol{\Phi} = \begin{pmatrix} 0.8 & 0.5 \\ 0.5 & 0.8 \end{pmatrix}$.
+      Que concluez-vous ? Que verrait-on sur un graphique des séries simulées ?
+
+> *Rappel : la condition porte sur le module des valeurs propres, et il faut y
+> prêter attention lorsqu'elles sont complexes.*
+
+<br> \bigskip
+
+### Exercice 3 — Lire un test de causalité de Granger
+
+Un VAR(2) est estimé sur des données trimestrielles américaines, 1980-2019, pour
+le taux de chômage ($u$) et le taux des fonds fédéraux ($ff$). On obtient :
+
+| Hypothèse nulle | Statistique $F$ | $p$-value |
+|---|---|---|
+| $ff$ ne cause pas $u$ au sens de Granger | 5.87 | 0.003 |
+| $u$ ne cause pas $ff$ au sens de Granger | 1.12 | 0.329 |
+
+  (a) Énoncez précisément, en termes de coefficients du VAR, l'hypothèse nulle
+      testée dans la première ligne.
+  (b) Concluez pour chacune des deux lignes au seuil de 5 %.
+  (c) Rédigez la conclusion de la première ligne en une phrase, **sans employer
+      le mot « cause » seul**.
+  (d) Un journaliste écrit : « la politique monétaire détermine le chômage, c'est
+      prouvé économétriquement ». Que lui répondez-vous ? Citez deux objections
+      distinctes.
+  (e) Le résultat de la seconde ligne signifie-t-il que le chômage n'influence
+      pas la Réserve fédérale ? Discutez.
+
+<br> \bigskip
+
+### Exercice 4 — Lire une réponse impulsionnelle
+
+On considère le même VAR bivarié $(u, ff)$. On calcule les réponses
+impulsionnelles orthogonalisées par factorisation de Cholesky.
+
+  (a) Rappelez à quoi sert la factorisation de Cholesky ici. Pourquoi ne peut-on
+      pas simplement « choquer $\varepsilon_{1,t}$ » sans précaution ?
+  (b) Avec l'ordre $(ff, u)$, la réponse instantanée de $u$ à un choc sur $ff$
+      est non nulle, mais la réponse instantanée de $ff$ à un choc sur $u$ est
+      exactement zéro. Expliquez d'où vient ce zéro.
+  (c) Quelle hypothèse économique cet ordre traduit-il ?
+  (d) On inverse l'ordre. Qu'est-ce qui change ? Sur quel argument choisit-on
+      entre les deux ? Un critère statistique peut-il trancher ?
+  (e) Une réponse impulsionnelle revient vers zéro après une quinzaine de
+      trimestres. Qu'est-ce que cela indique sur le système ? Et si elle n'y
+      revenait pas ?
+
+<br> \bigskip
+
+*Les questions 3.c, 3.d et 4.d sont formulées comme celles du partiel et du TP
+noté n°3. Elles portent toutes sur la même compétence : savoir ce qu'un résultat
+ne dit pas.*

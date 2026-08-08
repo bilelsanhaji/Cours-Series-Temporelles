@@ -1,0 +1,862 @@
+---
+title: "Chapitre 2 — Processus ARMA stationnaires"
+subtitle: "Économétrie des séries temporelles · M1 MBFA"
+# Configuration commune (thème, tableau blanc, découpage) : _quarto.yml à la racine
+format:
+  revealjs:
+    footer: "Économétrie des séries temporelles — Chapitre 2"
+---
+
+<!-- Version étudiante : engendrée automatiquement depuis la source
+     enseignante par 01-Slides/generer-version-etudiant.R.
+     Ne pas modifier ici — les changements seraient écrasés. -->
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(
+	echo = FALSE,
+	error = TRUE,
+	fig.width = 10,
+	fig.height = 5,
+	dpi = 192,
+	fig.keep ="last",
+	message = FALSE,
+	warning = FALSE,
+	results = "markup"
+)
+```
+
+
+
+<!-- comme \vspace{} -->
+
+
+```{r}
+#| label: libs2
+#| echo: false
+library(fredr) #https://fred.stlouisfed.org/docs/api/api_key.html
+fredr_set_key(Sys.getenv("FRED_API_KEY"))
+library(astsa)
+library(xts)
+library(quantmod)
+library(tseries)
+library(lmtest)
+library(tidyverse)
+library(urca)
+library(forecast)
+library(FinTS)
+```
+
+------------------------------------------------------------------------
+
+# Structure du cours
+
+Processus linéaires
+
+Décomposition de Wold
+
+Modèles de séries temporelles univariées : AR(p), MA(q)
+
+Équations de Yule Walker
+
+Décomposition de prédiction
+
+Estimation du maximum de vraisemblance
+
+Exemple empirique
+
+------------------------------------------------------------------------
+
+# 1. Processus linéaires
+
+Supposons que $\{y_t\}$ est un processus stochastique :
+
+**Opérateur retard**
+
+$$\begin{aligned}
+Ly_{t} &= y_{t-1} \nonumber \\
+L^{j}y_{t} &= y_{t-j} { \ \ \ } \forall j\in\mathbb{N}    \nonumber
+\end{aligned}$$
+
+**Opérateur différence**
+
+$$\begin{aligned}
+\Delta y_{t} &= \left(1-L\right)y_{t}=y_{t}-y_{t-1} \nonumber \\
+\Delta^{j}y_{t} &= \left(1-L\right)^{j}y_{t}  { \ \ \ } \forall j\in\mathbb{N}_{+}    \nonumber  \\
+\Delta_{s}y_{t} &= \left(1-L^{s}\right)y_{t}=y_{t}-y_{t-s}    \nonumber 
+\end{aligned}$$
+
+------------------------------------------------------------------------
+
+# 2. Décomposition de Wold
+
+La **décomposition de Wold** - tout processus stationnaire de covariance
+à moyenne nulle $\{y_t\}$ peut être représenté sous la forme :
+
+$$y_t = \sum_{j=0}^{\infty} \psi_j \varepsilon_{t-j} + \kappa_t$$
+
+où $\psi_0 = 1$ et $\sum_{j=0}^{\infty} \psi_j^2 < \infty$.
+$\varepsilon_t$ est un bruit blanc ; il représente l'erreur commise dans
+la prévision de $y_t$ sur la base d'une fonction linéaire de son passé
+$Y_{t-1} = y_{t-j}$ pour $j \geq 1$ :
+
+$$\varepsilon_t \equiv y_t - \widehat{\mathsf{E}}(y_t | Y_{t-1})$$
+
+Notez que $\mathsf{corr}(\kappa_t, \varepsilon_{t-j}) = 0, \forall j$,
+mais :
+
+$${\kappa_t} = \widehat{\mathsf{E}}(\kappa_t | Y_{t-1})$$
+
+$\widehat{\mathsf{E}}$ indique une projection linéaire sur un vecteur de
+variables aléatoires $Y_t$.
+
+------------------------------------------------------------------------
+
+## Approche de Box-Jenkins
+
+Approximation du polynôme à retard infini avec le rapport de deux
+polynômes d'ordre fini $\alpha(L)$ et $\beta(L)$ :
+
+$$\Psi(L) = \sum_{j=0}^{\infty} \psi_{j} L^{j} \simeq \frac{\beta(L)}{\alpha(L)} = \frac{1 + \beta_{1} L + \cdots + \beta_{q} L^{q}}{1 - \alpha_{1} L - \cdots - \alpha_{p} L^{p}}$$
+
+### Types de modèles de séries temporelles
+
+| Type         | Modèle                                       | $p$     | $q$     |
+|--------------|-------------------------------|--------------|--------------|
+| AR($p$)      | $\alpha(L) y_{t} = \varepsilon_{t}$          | $p > 0$ | $q = 0$ |
+| MA($q$)      | $y_{t} = \beta(L) \varepsilon_{t}$           | $p = 0$ | $q > 0$ |
+| ARMA($p, q$) | $\alpha(L) y_{t} = \beta(L) \varepsilon_{t}$ | $p > 0$ | $q > 0$ |
+
+------------------------------------------------------------------------
+
+# 3. Processus AR(1)
+
+Le processus AR(1) satisfait l'équation différentielle :
+\begin{equation}
+y_{t} = \nu + \alpha y_{t-1} + \varepsilon_{t}, \quad \varepsilon_{t} \sim \mathsf{WN}(0, \sigma^{2})
+\end{equation}
+
+En utilisant l'opérateur de retard : \begin{equation}
+(1 - \alpha L) y_{t} = \nu + \varepsilon_{t}.
+\end{equation}
+
+Lorsque $|\alpha| < 1$ : \begin{equation}
+(1 - \alpha L)^{-1} = \underset{j \rightarrow \infty}{\lim} \left(1 + \alpha L + \alpha^{2} L^{2} + \cdots + \alpha^{j} L^{j}\right)
+\end{equation}
+
+Par conséquent : \begin{equation}
+y_{t} = \left(1 + \alpha + \alpha^{2} + \cdots\right) \nu + \left(\varepsilon_{t} + \alpha \varepsilon_{t-1} + \alpha^{2} \varepsilon_{t-2} + \cdots\right)
+\end{equation}
+
+En prenant les espérances avec $|\alpha| < 1$ : \begin{equation}
+\mathsf{E}(y_{t}) = \frac{\nu}{1 - \alpha} = \mu
+\end{equation}
+
+------------------------------------------------------------------------
+
+### Analyse de stabilité basée sur une équation différentielle linéaire non homogène :
+
+\begin{equation}
+(y_{t} - \mu) = \alpha (y_{t-1} - \mu) + \varepsilon_{t}
+\end{equation}
+
+Par conséquent :
+
+\begin{equation}
+\mathsf{E}\left(y_{t} - \mu\right)^{2} = \alpha^{2} \mathsf{E}\left(y_{t-1} - \mu\right)^{2} + \mathsf{E}\left(\varepsilon_{t}^{2}\right) + 2\alpha \mathsf{E}\left[\left(y_{t-1} - \mu\right) \varepsilon_{t}\right]
+\end{equation}
+
+Sous la condition $|\alpha| < 1$ :
+
+\begin{equation}
+\mathsf{E}\left(y_{t} - \mu\right)^{2} = \mathsf{E}\left(y_{t-1} - \mu\right)^{2} = \gamma(0)
+\end{equation}
+
+de sorte que :
+
+\begin{equation}
+\mathsf{V}(y_{t}) = \gamma(0) = \frac{\sigma^{2}}{1 - \alpha^{2}}
+\end{equation}
+
+------------------------------------------------------------------------
+
+## Fonction d'autocovariance :
+
+\begin{equation}
+\mathsf{E}\left[\left(y_{t} - \mu\right)\left(y_{t-1} - \mu\right)\right] = \alpha \mathsf{E}\left(y_{t-1} - \mu\right)^{2} + \mathsf{E}\left[\left(y_{t-1} - \mu\right) \varepsilon_{t}\right]
+\end{equation}
+
+Par conséquent :
+
+\begin{equation}
+\gamma(1) = \alpha \gamma(0).
+\end{equation}
+
+Aussi :
+
+\begin{equation}
+\mathsf{E}\left[\left(y_{t} - \mu\right)\left(y_{t-2} - \mu\right)\right] = \alpha \mathsf{E}\left[\left(y_{t-1} - \mu\right)\left(y_{t-2} - \mu\right)\right] + \mathsf{E}\left[\left(y_{t-2} - \mu\right) \varepsilon_{t}\right]
+\end{equation}
+
+pour obtenir :
+
+\begin{equation}
+\gamma(2) = \alpha \gamma(1).
+\end{equation}
+
+En général :
+
+\begin{equation}
+\gamma(h) = \alpha \gamma(h-1) = \alpha^{h} \gamma(0)
+\end{equation}
+
+pour $h \neq 0$.
+
+------------------------------------------------------------------------
+
+## Coefficient d'autocorrélation :
+
+\begin{equation}
+\rho(h) = \frac{\gamma(h)}{\gamma(0)} = \frac{\alpha^{h} \gamma(0)}{\gamma(0)} = \alpha^{h}
+\end{equation}
+
+------------------------------------------------------------------------
+
+## Processus AR(1) stationnaires
+
+```{r}
+#| label: ar1statio
+#| echo: false
+par(mfrow=c(3,3))
+x = arima.sim(list(order = c(1,0,0), ar = 0.0), n = 200)
+tsplot(x, ylab = "AR(1), ar = 0.0")
+acf(x)
+pacf(x)
+x = arima.sim(list(order = c(1,0,0), ar = 0.5), n = 200)
+tsplot(x, ylab = "AR(1), ar = 0.5")
+acf(x)
+pacf(x)
+x = arima.sim(list(order = c(1,0,0), ar = -0.5), n = 200)
+tsplot(x, ylab = "AR(1), ar = -0.5")
+acf(x)
+pacf(x)
+```
+
+------------------------------------------------------------------------
+
+## Processus AR(1) persistents et non stationnaires
+
+```{r}
+#| label: ar1persist
+#| echo: false
+par(mfrow=c(3,3))
+x = arima.sim(list(order = c(1,0,0), ar = 0.9), n = 200)
+tsplot(x, ylab = "AR(1), ar = 0.9")
+acf(x)
+pacf(x)
+x = arima.sim(list(order = c(1,0,0), ar = 0.9999), n = 200)
+tsplot(x, ylab = "AR(1), ar = 0.99")
+acf(x)
+pacf(x)
+x = cumsum(rnorm(200))
+tsplot(x, ylab = "AR(1), ar = 1")
+acf(x)
+pacf(x)
+```
+
+------------------------------------------------------------------------
+
+# 4. Processus AR(2)
+
+\begin{equation}
+y_{t} = \nu + \alpha_{1} y_{t-1} + \alpha_{2} y_{t-2} + \varepsilon_{t}, \quad \varepsilon_{t} \sim \mathsf{WN}(0, \sigma^{2})
+\end{equation}
+
+En supposant la stationnarité :
+
+\begin{equation}
+\mathsf{E}(y_{t}) = \frac{\nu}{1 - \alpha_{1} - \alpha_{2}}
+\end{equation}
+
+Aussi :
+
+\begin{equation}
+\mathsf{V}(y_{t}) = \gamma(0) = \alpha_{1} \gamma(1) + \alpha_{2} \gamma(2) + \sigma^{2}
+\end{equation}
+
+Et :
+
+$$\begin{aligned}
+\gamma(1) &= \alpha_{1} \gamma(0) + \alpha_{2} \gamma(1) \nonumber \\
+\gamma(2) &= \alpha_{1} \gamma(1) + \alpha_{2} \gamma(0)
+\end{aligned}$$
+
+En résolvant pour $\gamma(0)$ :
+
+\begin{equation}
+\gamma(0) = \frac{(1 - \alpha_{2}) \sigma^{2}}{(1 + \alpha_{2})(1 - \alpha_{1} - \alpha_{2})(1 + \alpha_{1} - \alpha_{2})}
+\end{equation}
+
+------------------------------------------------------------------------
+
+## Conditions pour la stationnarité :
+
+\begin{equation}
+\alpha_{2} + \alpha_{1} < 1; \quad \alpha_{2} - \alpha_{1} < 1; \quad |\alpha_{2}| < 1
+\end{equation}
+
+Les racines complexes apparaissent si :
+
+\begin{equation}
+\alpha_{1}^{2} + 4\alpha_{2} < 0
+\end{equation}
+
+Équations de Yule-Walker :
+
+$$\begin{aligned}
+\rho(1) &= \alpha_{1} + \alpha_{2} \rho(1) \nonumber \\
+\rho(2) &= \alpha_{1} \rho(1) + \alpha_{2}
+\end{aligned}$$
+
+------------------------------------------------------------------------
+
+## Triangle de stationnarité avec séparation des racines complexes et réelles
+
+```{r}
+#| echo: false
+#| fig-width: 10
+#| fig-height: 5.5
+alpha1 <- seq(from = -2.5, to = 2.5, length = 51) 
+plot(alpha1,1+alpha1,lty="dashed",type="l",xlab="",ylab="",cex.axis=.8,ylim=c(-1.5,1.5))
+abline(a = -1, b = 0, lty="dashed")
+abline(a = 1, b = -1, lty="dashed")
+abline(h = 0, lty="dashed")
+abline(v =0, lty="dashed")
+title(ylab=expression(alpha[2]),xlab=expression(alpha[1]),cex.lab=1.2)
+polygon(x = alpha1[6:46], y = 1-abs(alpha1[6:46]), col=rgb(0.5, 0.5, 0.5, alpha = 0.5))
+lines(alpha1,-alpha1^2/4)
+text(0,-.5,expression(alpha[1]^2 +4*alpha[2]<0),cex=1.5)
+text(0,-0.7, expression("Racines complexes"))
+text(1.2,.5,expression(alpha[2]+alpha[1]>1),cex=1.5)
+text(-1.75,.5,expression(alpha[2]-alpha[1]>1),cex=1.5)
+text(0,0.5, expression("Racines réelles"))
+```
+
+------------------------------------------------------------------------
+
+## Processus AR(2) avec racines réelles
+
+```{r}
+#| label: ar2statio
+#| echo: false
+par(mfrow=c(3,3))
+x = arima.sim(list(order = c(2,0,0), ar = c(0.6, 0.3)), n = 200)
+tsplot(x, ylab = "AR(2), ar = 0.6 ; 0.3")
+acf(x)
+pacf(x)
+x = arima.sim(list(order = c(2,0,0), ar = c(0.3, 0.6)), n = 200)
+tsplot(x, ylab = "AR(2), ar = 0.3 ; 0.6")
+acf(x)
+pacf(x)
+x = arima.sim(list(order = c(2,0,0), ar = c(-0.3, 0.6)), n = 200)
+tsplot(x, ylab = "AR(2), ar = -0.3 ; 0.6")
+acf(x)
+pacf(x)
+```
+
+------------------------------------------------------------------------
+
+## Processus AR(2) avec racines complexes
+
+```{r}
+#| label: ar2nonstatio
+#| echo: false
+par(mfrow=c(3,3))
+x = arima.sim(list(order = c(2,0,0), ar = c(0.6, -0.8)), n = 200)
+tsplot(x, ylab = "AR(2), ar = 0.6 ; -0.8")
+acf(x)
+pacf(x)
+x = arima.sim(list(order = c(2,0,0), ar = c(0.6, -0.3)), n = 200)
+tsplot(x, ylab = "AR(2), ar = 0.6 ; -0.3")
+acf(x)
+pacf(x)
+x = arima.sim(list(order = c(2,0,0), ar = c(1.6, -0.8)), n = 200)
+tsplot(x, ylab = "AR(2), ar = 1.6 ; -0.8")
+acf(x)
+pacf(x)
+```
+
+------------------------------------------------------------------------
+
+# 5. Processus AR($p$)
+
+\begin{equation}
+y_{t} = \nu + \sum_{j=1}^{p} \alpha_{j} y_{t-j} + \varepsilon_{t}, \quad \varepsilon_{t} \sim \mathsf{WN}(0, \sigma^{2})
+\quad\quad (1)
+\end{equation}
+
+**Stabilité** : $\alpha(z) = 0 \Rightarrow |z| > 1$ garantit la
+stationnarité et la représentation MA($\infty$) :
+
+$$\begin{aligned}
+y_{t} &= \alpha(1)^{-1} \nu + \alpha(L)^{-1} \varepsilon_{t} \nonumber \\
+y_{t} &= \mu + \sum_{j=0}^{\infty} \psi_{j} \varepsilon_{t-j} \nonumber
+\end{aligned}$$
+
+où $\mu = \frac{\nu}{\alpha(1)}$ et $\Psi(L) = \alpha(L)^{-1}$ avec
+$\sum_{j=0}^{\infty} |\psi_{j}| < \infty$.
+
+En prenant les espérances de l'équation (1) :
+
+\begin{equation}
+\mathsf{E}(y_{t}) = \mu = \frac{\nu}{(1 - \alpha_{1} - \cdots - \alpha_{p})}
+\end{equation}
+
+------------------------------------------------------------------------
+
+## Fonction d'autocovariance :
+
+$$\begin{aligned}
+\gamma(h) &= \mathsf{E}(y_{t} y_{t-h}) = \mathsf{E}\left[
+\left(\alpha_{1} y_{t-1} + \cdots + \alpha_{p} y_{t-p} + \varepsilon_{t}\right) y_{t-h}\right] \nonumber \\
+&= \alpha_{1} \mathsf{E}(y_{t-1} y_{t-h}) + \cdots + \alpha_{p} \mathsf{E}(y_{t-p} y_{t-h}) + \mathsf{E}(\varepsilon_{t} y_{t-h}) \nonumber \\
+&= \alpha_{1} \gamma(h-1) + \cdots + \alpha_{p} \gamma(h-p)
+\end{aligned}$$
+
+Équations de Yule-Walker :
+
+$$\begin{aligned}
+\rho(1) &= \alpha_{1} + \alpha_{2} \rho(1) + \cdots + \alpha_{p} \rho(p-1) \\
+\rho(2) &= \alpha_{1} \rho(1) + \alpha_{2} + \cdots + \alpha_{p} \rho(p-2) \\
+\vdots & \\
+\rho(p) &= \alpha_{1} \rho(p-1) + \alpha_{2} \rho(p-2) + \cdots + \alpha_{p} \\
+\text{pour } \rho_{1}, \cdots, \rho_{p} && \\
+\rho(k) &= \alpha_{1} \rho(k-1) + \alpha_{2} \rho(k-2) + \cdots + \alpha_{p} \rho(k-p) \\
+\text{pour } k > p &
+\end{aligned}$$
+
+------------------------------------------------------------------------
+
+# 6. Processus de moyenne mobile
+
+\begin{equation}
+y_{t} = \mu + \beta(L) \varepsilon_{t} = \mu + \sum_{i=1}^{q} \beta_{i} \varepsilon_{t-i} + \varepsilon_{t}
+\end{equation}
+
+où $\varepsilon_{t} \sim \mathsf{WN}(0, \sigma^{2})$ et
+$\beta(L) = 1 + \beta_{1} L + \cdots + \beta_{q} L^{q}$,
+$\beta_{q} \neq 0$.
+
+Le processus MA($q$) est stationnaire pour tout
+$(\beta_{1}, \beta_{2}, \ldots, \beta_{q})$.
+
+**Inversibilité** : $\beta(z) = 0 \Rightarrow |z| > 1$ garantit la
+représentation AR($\infty$) :
+
+$$\begin{aligned}
+\beta(L)^{-1} y_{t} &= \beta(1)^{-1} \mu + \varepsilon_{t} \nonumber \\
+y_{t} &= \mu + \sum_{j=1}^{\infty} \phi_{j} (y_{t-j} - \mu) + \varepsilon_{t}
+\end{aligned}$$
+
+où
+$\phi(L) = 1 - \sum_{j=1}^{\infty} \phi_{j} L^{j} = 1 - \phi_{1} L - \phi_{2} L^{2} - \cdots = \beta(L)^{-1}$.
+
+------------------------------------------------------------------------
+
+## Fonction d'autocovariance :
+
+$$\begin{aligned}
+\gamma(0) &= \left(\sum_{i=0}^{q} \beta_{i}^{2}\right) \sigma^{2} \\
+\gamma(k) &= \left(\sum_{i=0}^{q-k} \beta_{i} \beta_{i+k}\right) \sigma^{2} \quad \text{pour } k = 1, 2, \ldots, q \\
+\gamma(k) &= 0 \quad \text{pour } k > q
+\end{aligned}$$
+
+**Les processus MA sont stationnaires et ergodiques.**
+
+------------------------------------------------------------------------
+
+## Processus MA(1)
+
+```{r}
+#| label: ma1
+#| echo: false
+par(mfrow=c(3,3))
+x = arima.sim(list(order = c(0,0,1), ma = 0.8), n = 200)
+tsplot(x, ylab = "MA(1), ma = 0.8")
+acf(x)
+pacf(x)
+x = arima.sim(list(order = c(0,0,1), ma = -0.8), n = 200)
+tsplot(x, ylab = "MA(1), ma = -0.8")
+acf(x)
+pacf(x)
+x = arima.sim(list(order = c(0,0,1), ma = -1.0), n = 200)
+tsplot(x, ylab = "MA(1), ar = -1.0")
+acf(x)
+pacf(x)
+```
+
+------------------------------------------------------------------------
+
+# 7. Processus ARMA($p, q$)
+
+$$\begin{aligned}
+\alpha(L) y_{t} &= \nu + \beta(L) \varepsilon_{t} \nonumber \\
+y_{t} &= \nu + \sum_{j=1}^{p} \alpha_{j} y_{t-j} + \varepsilon_{t} + \sum_{i=1}^{q} \beta_{i} \varepsilon_{t-i}
+\end{aligned}$$
+
+où $\varepsilon_{t} \sim \mathsf{WN}(0, \sigma^{2})$ ;
+
+$\alpha(L) = 1 - \alpha_{1} L - \cdots - \alpha_{p} L^{p}$,
+$\alpha_{p} \neq 0$ ;
+
+$\beta(L) = 1 + \beta_{1} L + \cdots + \beta_{q} L^{q}$,
+$\beta_{q} \neq 0$.
+
+**1. Stabilité**
+
+$\alpha(z) = 0 \Rightarrow |z| > 1$ garantit la stationnarité et la
+représentation MA($\infty$) :
+
+$$\begin{aligned}
+y_{t} &= \alpha(1)^{-1} \nu + \alpha(L)^{-1} \beta(L) \varepsilon_{t} \nonumber \\
+y_{t} &= \mu + \sum_{j=0}^{\infty} \psi_{j} \varepsilon_{t-j} \nonumber
+\end{aligned}$$
+
+------------------------------------------------------------------------
+
+**2. Inversibilité**
+
+$\beta(z) = 0 \Rightarrow |z| > 1$ permet la représentation AR($\infty$)
+:
+
+$$\begin{aligned}
+& \beta(L)^{-1} \alpha(L) (y_{t} - \mu) = \varepsilon_{t} \nonumber \\
+& y_{t} = \mu + \sum_{j=1}^{\infty} \phi_{j} (y_{t-j} - \mu) + \varepsilon_{t}
+\end{aligned}$$
+
+**3. Pas de racines communes dans** $\alpha(L)$ et $\beta(L)$
+
+$$\begin{aligned}
+\alpha(L) &= \prod_{j=1}^{p} (1 - \lambda_{j} L) \\
+\beta(L) &= \prod_{i=1}^{q} (1 - \mu_{i} L) \\
+&\Rightarrow \lambda_{j} \neq \mu_{i} \quad \forall i, j
+\end{aligned}$$
+
+------------------------------------------------------------------------
+
+## Processus ARMA(1,1)
+
+```{r}
+#| label: arma11
+#| echo: false
+par(mfrow=c(3,3))
+x = arima.sim(list(order = c(1,0,1), ar = 0.5, ma = 0.3), n = 2000)
+tsplot(x, ylab = "ARMA(1,1), ar = 0.5, ma = 0.3")
+acf(x)
+pacf(x)
+x = arima.sim(list(order = c(1,0,1), ar = 0.5, ma = 0.9), n = 200)
+tsplot(x, ylab = "ARMA(1,1), ar = 0.5, ma = 0.9")
+acf(x)
+pacf(x)
+x = arima.sim(list(order = c(1,0,1), ar = 0.5, ma = -0.9), n = 200)
+tsplot(x, ylab = "ARMA(1,1), ar = 0.5, ma = -0.9")
+acf(x)
+pacf(x)
+```
+
+------------------------------------------------------------------------
+
+# 8. Formulation statistique du modèle AR(1)
+
+**Indépendance conditionnelle** :
+$(y_t | y_0, \ldots, y_{t-1}) \stackrel{d}{=} (y_t | y_{t-1})$ ;
+
+**Distribution conditionnelle** :
+$(y_t | y_{t-1}) \stackrel{d}{=} \mathcal{N}(\nu + \alpha y_{t-1}, \sigma^2)$
+; $t \geq 1$ ;
+
+**Espace des paramètres** :
+$\nu, \alpha, \sigma^2 \in \mathbb{R} \times \mathbb{R} \times \mathbb{R}^+$.
+
+L'observation initiale $y_0$ n'est pas modélisée – conditionnelle à
+$y_0$.
+
+Le régresseur est la variable dépendante retardée.
+
+$$y_t = \nu + \alpha y_{t-1} + \varepsilon_t \quad \text{pour} \quad t = 1, \ldots, T.$$
+
+où $\varepsilon_t \sim \text{NID}(0, \sigma^2)$ sont des innovations.
+
+------------------------------------------------------------------------
+
+# 9. Vraisemblance autorégressive
+
+**Densité conditionnelle** :
+
+$$f(y_T, y_{T-1}, \ldots, y_1 | y_0) = f(y_T | y_{T-1}, \ldots, y_1, y_0) \times f(y_{T-1}, \ldots, y_1 | y_0)$$
+
+$$= f(y_T | y_{T-1}, \ldots, y_1, y_0) \times f(y_{T-1} | y_{T-2}, \ldots, y_1, y_0) \times f(y_{T-2}, \ldots, y_1 | y_0)$$
+
+$$= \cdots$$
+
+$$= \prod_{t=1}^{T} f(y_t | y_{t-1}, \ldots, y_1, y_0)$$
+
+Cette formule est généralement valable - décomposition de prédiction.
+
+En utilisant la propriété de Markov :
+
+$$f_{\nu, \alpha, \sigma^2}(y_T, \ldots, y_1 | y_0) = \prod_{t=1}^{T} f_{\nu, \alpha, \sigma^2}(y_t | y_{t-1})$$
+
+------------------------------------------------------------------------
+
+## MLE
+
+L'estimation par maximum de vraisemblance (MLE) de $(\nu, \alpha)$ est
+obtenue en minimisant la somme des carrés des résidus :
+
+$$\arg \max_{(\nu, \alpha)} l(\nu, \alpha) = \arg \min_{(\nu, \alpha)} \sum_{t=1}^{T} \varepsilon_t^2(\nu, \alpha)$$
+
+La MLE de $(\widetilde{\nu}, \widetilde{\alpha})$ est équivalente à
+l'estimation par les moindres carrés ordinaires (OLS) de
+$(\widehat{\nu}, \widehat{\alpha})$.
+
+$(\widetilde{\nu}, \widetilde{\alpha})$ sont des estimateurs convergents
+si $y_t$ est stationnaire et $\sqrt{T} (\widetilde{\delta} - \delta)$
+est asymptotiquement normalement distribué, où
+$\delta = (\nu, \alpha)'$.
+
+Les MLE basées sur la vraisemblance exacte et la vraisemblance
+conditionnelle sont asymptotiquement équivalentes.
+
+L'estimation par la méthode des moments (en utilisant les équations de
+Yule-Walker) est également équivalente pour $\alpha$.
+
+------------------------------------------------------------------------
+
+# AIC et BIC
+
+Pour effectuer une sélection de modèles avec des critères d'information.
+
+AIC est la méthode de sélection de modèles la plus connue et utilisée.
+
+**AIC** Akaike (1973) : $$\mathsf{AIC} = -2 \times LogLik + 2 \times p$$
+
+**BIC** Schwarz (1978) :
+$$\mathsf{BIC} = -2 \times LogLik + \log(n) \times p$$
+
+avec $n$ le nombre d'observations dans l'échantillon étudié et $p$ le
+nombre de paramètres.
+
+**Plus petit est AIC/BIC, meilleur est le modèle**.
+
+```{r}
+#| label: aic-bic
+# DGP connu : AR(1) de coefficient 0.7. On compare trois spécifications.
+set.seed(2627)
+z <- arima.sim(list(ar = 0.7), n = 300)
+
+m1 <- arima(z, order = c(1, 0, 0))   # le vrai modèle
+m2 <- arima(z, order = c(2, 0, 0))   # sur-paramétré
+m3 <- arima(z, order = c(4, 0, 1))   # nettement sur-paramétré
+
+data.frame(
+  modele = c("AR(1)", "AR(2)", "ARMA(4,1)"),
+  p      = c(2, 3, 6),
+  AIC    = round(c(AIC(m1), AIC(m2), AIC(m3)), 1),
+  BIC    = round(c(BIC(m1), BIC(m2), BIC(m3)), 1)
+)
+```
+
+Le BIC pénalise plus lourdement que l'AIC : l'écart entre les deux colonnes
+s'accroît avec le nombre de paramètres. C'est pourquoi le BIC retrouve plus
+souvent le vrai modèle, et l'AIC plus souvent un modèle trop riche.
+
+------------------------------------------------------------------------
+
+# 10. Analyse de la mauvaise spécification et des résidus :
+## Tests de mauvaise spécification et Tests de diagnostic
+
+Les hypothèses faites lors de la construction de modèles économétriques.
+
+Exemple -- Modèle AR(1) :
+
+$$y_{t} = \nu + \alpha y_{t-1} + \varepsilon_{t}$$
+
+Le modèle statistique conditionnel de $y_{1}, y_{2}, \ldots, y_{T}$
+étant donné $y_{0}$ est défini par les hypothèses suivantes :
+
+1.  **Indépendance** : $\varepsilon_{1}, \ldots, \varepsilon_{T}$ sont
+    indépendants ;
+
+2.  **Normalité conditionnelle** :
+    $\varepsilon_{t} \overset{D}{=} \mathsf{N}(0, \sigma^{2})$ ;
+
+3.  **Espace des paramètres** :
+    $\nu, \alpha, \sigma^{2} \in \mathbb{R} \times \mathbb{R} \times \mathbb{R}_{+}$.
+
+**Il est important de tester si ces hypothèses sont valides.**
+
+------------------------------------------------------------------------
+
+## Normalité
+
+Tester si l'asymétrie et l'aplatissement correspondent à une
+distribution normale.
+
+Soit $x_{t} \sim \mathsf{D}(\mu, \sigma^{2})$ tel que :
+
+$$y_{t} = \frac{x_{t} - \mu}{\sigma} \sim \mathsf{D}(0, 1)$$
+
+Définir :
+
+$$\kappa_{3} = \mathsf{E}(y_{t}^{3}) \quad \text{(asymétrie)}$$
+
+$$\kappa_{4} = \mathsf{E}(y_{t}^{4}) - 3 \quad \text{(excès d'aplatissement)}$$
+
+Le test de **Jarque-Bera** - $H_{0} : \kappa_{3} = \kappa_{4} = 0$ pour
+la normalité.
+
+$JB=\frac{T-k}{6}\left(\kappa_3^2+\frac{\kappa_4^2}{4}\right) \sim \chi^{2}_{2}$
+et $k$ le nombre de variables explicatives.
+
+------------------------------------------------------------------------
+
+## Hétéroscédasticité
+
+Hétéroscédasticité - variance non constante
+
+**Test de White (1980)** : La variance
+$\mathsf{V}(\varepsilon_{t} | Y_{t-1})$ varie-t-elle avec $Y_{t-1}$ ?
+
+1.  Obtenir les résidus $\widehat{\varepsilon}_{t}$ du modèle original.
+
+2.  Obtenir $R^{2}_{het}$ à partir de la régression auxiliaire :
+    $$\widehat{\varepsilon}^{2}_{t} = \beta_{1} + \beta_{2} y_{t-1} + \beta_{3} y_{t-1}^{2} + \eta_{t}$$
+
+3.  Tester $\beta_{2} = \beta_{3} = 0$ en utilisant :
+
+$$T R^{2}_{het} \approx F_{het} = \frac{R^{2}_{het} / m}{(1 - R^{2}_{het}) / (T - k - m - 1)}$$
+
+où $k$ est le nombre de régresseurs et $m$ est le nombre de termes
+quadratiques et de produits croisés.
+
+Notez que le $TR^{2}_{het} \sim \chi_2^2$
+
+------------------------------------------------------------------------
+
+## Forme fonctionnelle
+
+La forme fonctionnelle log-linéaire est souvent supposée.
+
+**Test RESET de Ramsey (1969)** : Erreur de spécification de la
+régression.
+
+Les polynômes de la variable prédite $\widehat{y}_{t}$ aident-ils à
+expliquer $y_{t}$ ? Sous l'hypothèse nulle, les variables de la forme
+fonctionnelle correcte sont irrelevantes.
+
+1.  Obtenir les variables prédites $\widehat{y}_{t}$ du modèle original.
+
+2.  Obtenir la corrélation partielle $R^{2}_{reset}$ de $y_{t}$ et
+    $\widehat{y}_{t}^{2}$ étant donné $y_{t-1}$ à partir de la
+    régression auxiliaire :
+    $$y_{t} = \beta_{1} + \beta_{2} y_{t-1} + \beta_{3} \widehat{y}_{t}^{2} + \eta_{t}$$
+
+3.  Tester $\beta_{3} = 0$ en utilisant :
+
+$$TR^{2}_{reset} \approx F_{reset} = \frac{R^{2}_{reset} / m}{(1 - R^{2}_{reset}) / (T - k - m - 1)}$$
+
+où $k$ est le nombre de régresseurs et $m$ est le nombre de
+restrictions.
+
+------------------------------------------------------------------------
+
+## Erreurs autocorrélées
+
+L'indépendance des innovations dans un AR(1) implique
+$H_{0} : \alpha_{2} = 0$ dans :
+
+$$y_{t} = \nu + \alpha_{1} y_{t-1} + \alpha_{2} y_{t-2} + \varepsilon_{t}$$
+
+où $\varepsilon_{t} \sim \mathsf{NID}(0, \sigma^{2})$.
+
+Test du rapport de vraisemblance pour $\alpha_{2} = 0$ :
+
+$$LR = -T \log \left(1 - r_{02.1}^{2}\right)$$
+où $r_{02.1}^{2}$ est le coefficient de détermination partiel entre $y_t$ et $y_{t-2}$ conditionnellement à $y_{t-1}$.
+
+Test LM : régression auxiliaire -- obtenir $R^{2}_{ar}$ à partir de :
+
+$$\widehat{\varepsilon}_{t} = \beta_{1} + \beta_{2} y_{t-1} + \beta_{3} \widehat{\varepsilon}_{t-1} + \eta_{t}$$
+
+Tester $\beta_{2} = \beta_{3} = 0$ en utilisant :
+
+$$T R^{2}_{ar} \approx F_{ar} = \frac{R^{2}_{ar} / m}{(1 - R^{2}_{ar}) / (T - k - m - 1)}$$
+
+où $k$ est le nombre de régresseurs et $m$ est le nombre de
+restrictions.
+
+------------------------------------------------------------------------
+
+## Autocorrélation
+
+### Box-Pierce et Ljung-Box
+
+$H_0$ : absence d'autocorrélation
+
+$H_1$ : autocorrélation
+
+Idée principale : On estime la fonction d'autocorrélation et on teste si elle est nulle jusqu'à un certain nombre de retards $m$.
+
+$$ H_0 : \rho(1) =  \rho(2) = \cdots = \rho(m) =0 $$ 
+
+La statistique du test Ljung-Box :
+
+$$ Q(m) = T(T+2) \sum_{h=1}^{m} \frac{\widehat{\rho}(h)^2}{T-h} $$
+
+avec
+$\widehat{\rho}(h) = \frac{\sum_{t=h+1}^{T}(\varepsilon_t-\overline{\varepsilon})(\varepsilon_{t-h}-\overline{\varepsilon})}{(\varepsilon_t-\overline{\varepsilon})^2}$
+
+On rejette $H_0$ si $Q(m)>q_{\alpha}$ avec $q_{\alpha}$ le
+$100(1-\alpha)$ quantile d'une $\chi^2_{m-p-q}$
+
+------------------------------------------------------------------------
+
+## Erreurs ARCH
+
+**Engle (1982)** : Hétéroscédasticité conditionnelle autorégressive
+
+ARCH - les variances des innovations sont une fonction du temps :
+
+$$\mathsf{V}(\varepsilon_{t} | \varepsilon_{t-1}) = \beta_{1} + \beta_{2} \varepsilon_{t-1}^{2}$$
+
+1.  Obtenir les résidus $\widehat{\varepsilon}_{t}$ du modèle original.
+
+2.  Obtenir $R^{2}_{arch}$ à partir de la régression auxiliaire :
+    $$\widehat{\varepsilon}_{t}^{2} = \beta_{1} + \beta_{2} \widehat{\varepsilon}_{t-1}^{2} + \eta_{t}$$
+
+3.  Tester $H_{0} : \beta_{2} = 0$ en utilisant :
+
+$$T R^{2}_{arch} \approx F_{arch} = \frac{R^{2}_{arch} / m}{(1 - R^{2}_{arch}) / (T - k - m - 1)}$$
+
+où $k$ est le nombre de régresseurs et $m$ est le nombre de
+restrictions.
+
+------------------------------------------------------------------------
+
+## Conclusion
+
+Le modèle est non congruent - échoue au test de normalité.
+
+Un modèle AR($p$) ($p > 1$) pourrait être essayé.
+
+L'explication macroéconomique suggère que des covariables sont
+nécessaires.
+
+Pas de preuves statistiques de non-stationnarité, mais forte persistence
+
+:   $\alpha=0.9704^{\star\star\star}$
+
+Par conséquent, examiner les données comme non stationnaires ensuite.
+
+Puis considérer les modèles dynamiques multivariés.

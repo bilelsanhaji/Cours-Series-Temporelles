@@ -1,0 +1,123 @@
+---
+title: "Économétrie des Séries Temporelles"
+author: "Fiche TP #4"
+date: "Modèles VAR — estimation, Granger, réponses impulsionnelles"
+format: pdf
+---
+
+*Séance 11. Ce TP reprend le parcours appliqué qui figurait auparavant dans le
+chapitre 4 du cours. Il prépare le TP noté n°3, qui se déroule dans le même
+créneau.*
+
+# Avant de commencer
+
+**Langage.** `R` ou `Python`, au choix. Les fonctions équivalentes sont dans
+`03-TP/correspondance-R-python.md`.
+
+**Données.** Deux séries trimestrielles américaines, 1980-2019 :
+
+| Variable | Série FRED | Description |
+|---|---|---|
+| $y_1$ | `GDPC1` | PIB réel |
+| $y_2$ | `UNRATE` | Taux de chômage |
+
+L'accès à FRED demande une clé personnelle gratuite
+([obtention](https://fred.stlouisfed.org/docs/api/api_key.html)). **Stockez-la
+dans une variable d'environnement**, jamais dans le code :
+
+::: {.panel-tabset}
+
+### `R`
+
+```r
+# une fois pour toutes, dans ~/.Renviron :  FRED_API_KEY=votre_cle
+fredr::fredr_set_key(Sys.getenv("FRED_API_KEY"))
+```
+
+### `Python`
+
+```python
+import os
+os.environ["FRED_API_KEY"] = "..."   # ou via un fichier .env
+```
+
+:::
+
+> **Sans connexion ou sans clé**, travaillez sur les deux séries d'insolation
+> annuelles de `04-Data/SH_IN_metropole/` (Nice et Paris). Toutes les questions
+> restent valables, seule l'interprétation économique change.
+
+---
+
+# Exercice 1 — Préparer les données
+
+  (a) Chargez les deux séries et alignez-les sur une période commune.
+  (b) Transformez le PIB en taux de croissance et le chômage en variation. Pourquoi
+      ces transformations plutôt que les niveaux ?
+  (c) Représentez les deux séries transformées sur un même graphique.
+  (d) Testez la stationnarité de chacune. Si l'une résiste, que faites-vous — et
+      quelle contrainte cela impose-t-il à l'autre ?
+
+---
+
+# Exercice 2 — VAR contre AR
+
+  (a) Estimez un VAR(1) sur le système bivarié.
+  (b) Estimez séparément un AR(1) sur chaque série.
+  (c) Comparez les résidus des deux approches : variance, ACF, corrélation
+      croisée. Qu'apporte le VAR que les AR univariés ne capturent pas ?
+  (d) Produisez une prévision à quatre trimestres avec chacune des deux
+      approches. Laquelle retenez-vous, et sur quel critère ?
+
+---
+
+# Exercice 3 — Spécification
+
+  (a) Sélectionnez le nombre de retards par AIC, BIC et HQ. Les trois critères
+      s'accordent-ils ? Si non, lequel suivez-vous ?
+  (b) Estimez le VAR au retard retenu.
+  (c) Vérifiez la stabilité du système. Que regardez-vous exactement ?
+  (d) Testez l'absence d'autocorrélation des résidus du système. Si le test
+      rejette, que faites-vous ?
+  (e) Représentez l'ACF et la PACF des résidus de chaque équation, ainsi que
+      leur corrélation croisée.
+
+---
+
+# Exercice 4 — Causalité de Granger
+
+  (a) Testez la causalité de Granger dans les deux sens.
+  (b) Présentez les résultats dans un tableau : sens testé, statistique,
+      $p$-value, conclusion.
+  (c) Rédigez chaque conclusion en une phrase, sans employer le mot « cause »
+      seul.
+  (d) Le résultat change-t-il si vous modifiez le nombre de retards ? Testez-le.
+      Que faut-il en conclure sur la robustesse de ce type de résultat ?
+
+---
+
+# Exercice 5 — Réponses impulsionnelles
+
+  (a) Calculez et représentez les réponses impulsionnelles orthogonalisées, avec
+      leurs intervalles de confiance.
+  (b) Décrivez la réponse du chômage à un choc sur le PIB : signe, ampleur,
+      persistance, moment du pic.
+  (c) Recommencez en inversant l'ordre des variables. Comparez les deux jeux de
+      réponses sur un même graphique.
+  (d) Quel ordre retenez-vous, et sur quel argument ? Écrivez-le explicitement :
+      c'est une hypothèse d'identification, elle doit être défendue.
+  (e) Calculez la décomposition de la variance de l'erreur de prévision à
+      l'horizon de 4 et 12 trimestres. Que vous apprend-elle de plus que les IRF ?
+
+---
+
+# Pour aller plus loin
+
+Reprenez l'exercice avec un système **trivarié** : chômage, taux des fonds
+fédéraux (`DFF`) et déflateur du PIB (`GDPDEF`). C'est la spécification de type
+règle de Taylor présentée en cours.
+
+Attention : le déflateur est vraisemblablement $\mathsf{I}(2)$. Vérifiez-le avant
+d'estimer, et différenciez autant de fois que nécessaire — en gardant à l'esprit
+qu'un système où les variables ne sont pas intégrées au même ordre pose un
+problème que le chapitre 5 aborde.

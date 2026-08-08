@@ -1,0 +1,109 @@
+---
+title: "Économétrie des Séries Temporelles"
+author: "Fiche TP #5"
+date: "Cointégration et modèles à correction d'erreur"
+format: pdf
+---
+
+> **Fiche fournie, non traitée en séance.** Elle complète le chapitre 5 pour ceux
+> qui veulent aller au bout de la mise en œuvre. Elle n'est ni au programme des
+> TP notés, ni exigible au partiel sous forme de code — mais les notions qu'elle
+> illustre, elles, le sont.
+
+# Le cas `cay`
+
+Lettau et Ludvigson (2001) montrent que la déviation à la relation de long terme
+entre consommation ($c$), richesse ($a$) et revenu ($y$) prédit les rendements
+boursiers futurs. Les trois séries sont $\mathsf{I}(1)$ mais liées par une
+relation stationnaire : c'est le cas d'école de la cointégration en finance.
+
+**Données FRED**, trimestrielles :
+
+| | Série | Description |
+|---|---|---|
+| $c$ | `PCECC96` | Consommation réelle |
+| $a$ | `TNWBSHNO` | Richesse nette des ménages |
+| $y$ | `DPIC96` | Revenu disponible réel |
+
+Passez les trois en logarithme.
+
+---
+
+# Exercice 1 — Ordre d'intégration
+
+  (a) Représentez les trois séries en logarithme.
+  (b) Testez la présence d'une racine unitaire dans chacune, en niveau puis en
+      différence première.
+  (c) Concluez : les trois séries sont-elles $\mathsf{I}(1)$ ? La cointégration
+      a-t-elle un sens ici ?
+
+> C'est l'étape que l'on saute le plus volontiers, et c'est celle qui invalide
+> tout le reste si elle est mal faite. La cointégration n'a de sens qu'entre
+> séries intégrées **du même ordre**.
+
+---
+
+# Exercice 2 — Engle-Granger
+
+  (a) Régressez $c_t$ sur $a_t$ et $y_t$. Notez les coefficients estimés.
+  (b) Récupérez les résidus et représentez-les. Que devraient-ils être si les
+      séries sont cointégrées ?
+  (c) Testez la racine unitaire dans les résidus.
+  (d) **Pourquoi les valeurs critiques usuelles de Dickey-Fuller ne
+      s'appliquent-elles pas ici ?** Quelles tables faut-il utiliser ?
+  (e) Concluez sur l'existence d'une relation de cointégration.
+  (f) Recommencez en régressant $a_t$ sur $c_t$ et $y_t$. Obtenez-vous la même
+      conclusion ? C'est l'une des limites connues de la procédure : laquelle ?
+
+---
+
+# Exercice 3 — Johansen
+
+  (a) Appliquez le test de Johansen (statistique de la trace) au système des
+      trois variables.
+  (b) Lisez le tableau de sortie : combien de relations de cointégration
+      retenez-vous, et à quel seuil ?
+  (c) Extrayez le vecteur de cointégration normalisé. Comparez-le aux
+      coefficients obtenus en 2.a. Sont-ils proches ?
+  (d) Quel avantage Johansen a-t-il sur Engle-Granger ? Quel est son coût ?
+
+---
+
+# Exercice 4 — VECM
+
+  (a) Estimez le VECM correspondant au rang retenu.
+  (b) Identifiez le terme de correction d'erreur dans chaque équation.
+  (c) **Commentez le signe et l'ampleur des coefficients d'ajustement.** Quelle
+      variable supporte le retour à l'équilibre ? En combien de trimestres la
+      moitié d'un écart est-elle résorbée ?
+  (d) Un coefficient d'ajustement positif serait-il interprétable ? Pourquoi ?
+
+---
+
+# Exercice 5 — Diagnostic
+
+Sur les résidus du VECM :
+
+  (a) Testez l'absence d'autocorrélation sérielle.
+  (b) Testez la normalité, et représentez histogramme et QQ-plot.
+  (c) Testez la présence d'effets ARCH.
+  (d) Que faites-vous des rejets éventuels ? Distinguez ceux qui invalident
+      l'estimation de ceux qui invalident seulement l'inférence.
+
+---
+
+# Exercice 6 — Le point de départ du chapitre 3
+
+Simulez deux marches aléatoires **indépendantes** de 200 observations, puis
+régressez l'une sur l'autre.
+
+  (a) Relevez le $R^2$ et la statistique de Student de la pente.
+  (b) Répétez l'opération 1000 fois. Quelle proportion des cas conduit à rejeter
+      la nullité de la pente au seuil de 5 % ?
+  (c) Comparez cette proportion aux 5 % attendus. Commentez.
+  (d) Appliquez maintenant la procédure d'Engle-Granger à l'un de ces couples.
+      Que conclut-elle, et pourquoi est-ce rassurant ?
+
+> Cet exercice est le meilleur résumé du semestre : il montre pourquoi la
+> régression fallacieuse est un vrai problème, et pourquoi la cointégration en
+> est la réponse.

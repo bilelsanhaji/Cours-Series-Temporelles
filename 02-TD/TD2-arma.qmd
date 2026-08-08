@@ -26,3 +26,37 @@ montrez que
   (a) $\rho_k=0.8\rho_{k-1}$
   (b) $\rho_2=0.8\rho_1+0.6\sigma_{\varepsilon}^2/\gamma_0$
 
+### Exercice 4
+
+Soit le processus $Y_t = \varepsilon_t + \theta_1 \varepsilon_{t-1} + \theta_2 \varepsilon_{t-2}$,
+où $\{\varepsilon_t\}$ est un bruit blanc de variance $\sigma^2$.
+
+  (a) Calculez $\gamma_0$, $\gamma_1$ et $\gamma_2$.
+  (b) Montrez que $\gamma_k = 0$ pour tout $k > 2$.
+  (c) Application numérique : $\theta_1 = 0.6$, $\theta_2 = -0.3$. Calculez
+      $\rho_1$ et $\rho_2$, puis esquissez l'allure de l'ACF.
+  (d) Ce processus est-il inversible ? Justifiez par les racines du polynôme
+      $\Theta(z)$.
+
+### Exercice 5 — Identification
+
+Pour chacune des quatre situations décrites ci-dessous, proposez un modèle de la
+famille ARMA et justifiez votre choix **en une phrase**. Précisez à chaque fois
+l'ordre que vous retenez.
+
+  (a) L'ACF décroît de façon exponentielle ; la PACF s'annule brutalement
+      après le retard 1.
+  (b) L'ACF s'annule brutalement après le retard 2 ; la PACF décroît en
+      alternant de signe.
+  (c) L'ACF et la PACF décroissent toutes deux, sans coupure nette.
+  (d) L'ACF reste proche de $1$ sur trente retards et décroît très lentement de
+      façon linéaire.
+
+Pour le cas (d), la réponse attendue n'est pas un modèle ARMA. Dites pourquoi, et
+ce que vous feriez avant d'aller plus loin.
+
+<br> \bigskip
+
+*Les exercices 4 et 5 préparent directement le TP noté n°1 de la séance 7 et la
+partie 2 du partiel.*
+

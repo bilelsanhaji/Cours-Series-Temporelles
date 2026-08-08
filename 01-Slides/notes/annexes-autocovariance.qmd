@@ -378,7 +378,7 @@ Le calcul des autocovariances et autocorrélations d'un processus ARMA est plus 
 $$
 Y_t = \phi_1 Y_{t-1} + \theta_1 \varepsilon_{t-1} + \varepsilon_t
 $$
-Puisque \( P = Q = 1 \), le système de Yule-Walker nécessite deux équations, en notant que l'autocovariance d'ordre 3 ou plus est une fonction triviale des deux premières autocovariances.
+Puisque $P = Q = 1$, le système de Yule-Walker nécessite deux équations, en notant que l'autocovariance d'ordre 3 ou plus est une fonction triviale des deux premières autocovariances.
 
 $$
 \begin{aligned}
@@ -387,7 +387,7 @@ $$
 \end{aligned}
 $$
 
-La présence du terme \( \mathbb{E}[\theta_1 \varepsilon_{t-1} Y_t] \) dans la première équation complique la résolution du système, car \( \varepsilon_{t-1} \) apparaît directement dans \( Y_t \) via \( \theta_1 \varepsilon_{t-1} \) et indirectement via \( \phi_1 Y_{t-1} \). Les relations non nulles peuvent être déterminées en substituant récursivement \( Y_t \) jusqu'à ce qu'il ne consiste qu'en \( \varepsilon_t \), \( \varepsilon_{t-1} \) et \( Y_{t-2} \) (puisque \( Y_{t-2} \) est non corrélé avec \( \varepsilon_{t-1} \) par l'hypothèse de bruit blanc).
+La présence du terme $\mathbb{E}[\theta_1 \varepsilon_{t-1} Y_t]$ dans la première équation complique la résolution du système, car $\varepsilon_{t-1}$ apparaît directement dans $Y_t$ via $\theta_1 \varepsilon_{t-1}$ et indirectement via $\phi_1 Y_{t-1}$. Les relations non nulles peuvent être déterminées en substituant récursivement $Y_t$ jusqu'à ce qu'il ne consiste qu'en $\varepsilon_t$, $\varepsilon_{t-1}$ et $Y_{t-2}$ (puisque $Y_{t-2}$ est non corrélé avec $\varepsilon_{t-1}$ par l'hypothèse de bruit blanc).
 
 $$
 \begin{aligned}
@@ -398,7 +398,7 @@ Y_t &= \phi_1 Y_{t-1} + \theta_1 \varepsilon_{t-1} + \varepsilon_t \\
 \end{aligned}
 $$
 
-Ainsi, \( \mathbb{E}[\theta_1 \varepsilon_{t-1} Y_t] = \theta_1 (\phi_1 + \theta_1) \sigma^2 \), et les équations de Yule-Walker peuvent être exprimées en utilisant les moments populationnels et les paramètres du modèle.
+Ainsi, $\mathbb{E}[\theta_1 \varepsilon_{t-1} Y_t] = \theta_1 (\phi_1 + \theta_1) \sigma^2$, et les équations de Yule-Walker peuvent être exprimées en utilisant les moments populationnels et les paramètres du modèle.
 
 $$
 \begin{aligned}
@@ -419,7 +419,7 @@ $$
 \end{aligned}
 $$
 
-De même, pour \( \gamma_1 \) :
+De même, pour $\gamma_1$ :
 
 $$
 \begin{aligned}
@@ -444,7 +444,7 @@ $$
 \mathbb{E}[Y_t Y_{t-2}] = \mathbb{E}[\phi_1 Y_{t-1} Y_{t-2}] + \mathbb{E}[\theta_1 \varepsilon_{t-1} Y_{t-2}] + \mathbb{E}[\varepsilon_t Y_{t-2}]
 $$
 
-Ainsi, \( \gamma_2 = \phi_1 \gamma_1 \), et en divisant les deux côtés par \( \gamma_0 \), on obtient \( \rho_2 = \phi_1 \rho_1 \). Les autocovariances et autocorrélations d'ordre supérieur suivent respectivement \( \gamma_s = \phi_1 \gamma_{s-1} \) et \( \rho_s = \phi_1 \rho_{s-1} \), et donc \( \rho_s = \phi_1^{s-1} \rho_1 \) pour \( s \geq 2 \).
+Ainsi, $\gamma_2 = \phi_1 \gamma_1$, et en divisant les deux côtés par $\gamma_0$, on obtient $\rho_2 = \phi_1 \rho_1$. Les autocovariances et autocorrélations d'ordre supérieur suivent respectivement $\gamma_s = \phi_1 \gamma_{s-1}$ et $\rho_s = \phi_1 \rho_{s-1}$, et donc $\rho_s = \phi_1^{s-1} \rho_1$ pour $s \geq 2$.
 
 
 ## A.2 Substitution rétroactive
@@ -457,7 +457,7 @@ Le processus AR(1),
 $$
 Y_t = \phi_1 Y_{t-1} + \varepsilon_t,
 $$
-est stationnaire si \(|\phi_1| < 1\) et si \(\{\varepsilon_t\}\) est un bruit blanc. Pour calculer les autocovariances et autocorrélations en utilisant la substitution rétroactive, on transforme \(Y_t = \phi_1 Y_{t-1} + \varepsilon_t\) en un processus MA pur par substitution récursive :
+est stationnaire si $|\phi_1| < 1$ et si $\{\varepsilon_t\}$ est un bruit blanc. Pour calculer les autocovariances et autocorrélations en utilisant la substitution rétroactive, on transforme $Y_t = \phi_1 Y_{t-1} + \varepsilon_t$ en un processus MA pur par substitution récursive :
 
 $$
 \begin{aligned}
@@ -485,9 +485,9 @@ $$
 \end{aligned}
 $$
 
-L'étape difficile dans la dérivation est la séparation des \(\varepsilon_{t-i}\) en ceux qui sont appariés à leur propre retard (\(\varepsilon_{t-i}^2\)) et ceux qui ne le sont pas (\(\varepsilon_{t-i} \varepsilon_{t-j}, i \neq j\)). Le reste de la dérivation découle de l'hypothèse que \(\{\varepsilon_t\}\) est un bruit blanc, donc \(\mathbb{E}[\varepsilon_{t-i}^2] = \sigma^2\) et \(\mathbb{E}[\varepsilon_{t-i} \varepsilon_{t-j}] = 0\) pour \(i \neq j\). Enfin, l'identité \(\lim_{n \to \infty} \sum_{i=0}^n \phi_1^{2i} = \frac{1}{1 - \phi_1^2}\) pour \(|\phi_1| < 1\) a été utilisée pour simplifier l'expression.
+L'étape difficile dans la dérivation est la séparation des $\varepsilon_{t-i}$ en ceux qui sont appariés à leur propre retard ($\varepsilon_{t-i}^2$) et ceux qui ne le sont pas ($\varepsilon_{t-i} \varepsilon_{t-j}, i \neq j$). Le reste de la dérivation découle de l'hypothèse que $\{\varepsilon_t\}$ est un bruit blanc, donc $\mathbb{E}[\varepsilon_{t-i}^2] = \sigma^2$ et $\mathbb{E}[\varepsilon_{t-i} \varepsilon_{t-j}] = 0$ pour $i \neq j$. Enfin, l'identité $\lim_{n \to \infty} \sum_{i=0}^n \phi_1^{2i} = \frac{1}{1 - \phi_1^2}$ pour $|\phi_1| < 1$ a été utilisée pour simplifier l'expression.
 
-La première autocovariance peut être calculée en utilisant les mêmes étapes sur la représentation MA(\(\infty\)) :
+La première autocovariance peut être calculée en utilisant les mêmes étapes sur la représentation MA($\infty$) :
 $$
 \begin{aligned}
 \gamma_1 &= \mathbb{E}[Y_t Y_{t-1}]  \\
@@ -501,7 +501,7 @@ $$
 \end{aligned}
 $$
 
-De même, l'autocovariance d'ordre \(s\) peut être déterminée :
+De même, l'autocovariance d'ordre $s$ peut être déterminée :
 $$
 \begin{aligned}
 \gamma_s &= \mathbb{E}[Y_t Y_{t-s}]  \\
@@ -522,12 +522,12 @@ $$
 ### A.2.2 MA(1)
 
 Le modèle MA(1) est le modèle de série temporelle non dégénéré le plus simple considéré dans ce cours :
-\[
+$$
 Y_t = \theta_1 \varepsilon_{t-1} + \varepsilon_t.
-\]
+$$
 
 La dérivation de sa fonction d'autocorrélation est triviale, car aucune substitution rétroactive n'est nécessaire. La variance est donnée par :
-\[
+$$
 \begin{aligned}
 \gamma_0 &= \text{Var}[Y_t] = \mathbb{E}[Y_t^2]  \\
 &= \mathbb{E}[(\theta_1 \varepsilon_{t-1} + \varepsilon_t)^2] \\
@@ -536,10 +536,10 @@ La dérivation de sa fonction d'autocorrélation est triviale, car aucune substi
 &= \theta_1^2 \sigma^2 + 0 + \sigma^2 \\
 &= \sigma^2 (1 + \theta_1^2).
 \end{aligned}
-\]
+$$
 
 La première autocovariance est :
-\[
+$$
 \begin{aligned}
 \gamma_1 &= \mathbb{E}[Y_t Y_{t-1}]  \\
 &= \mathbb{E}[(\theta_1 \varepsilon_{t-1} + \varepsilon_t)(\theta_1 \varepsilon_{t-2} + \varepsilon_{t-1})] \\
@@ -548,10 +548,10 @@ La première autocovariance est :
 &= 0 + \theta_1 \sigma^2 + 0 + 0 \\
 &= \theta_1 \sigma^2.
 \end{aligned}
-\]
+$$
 
 La deuxième autocovariance (et les autocovariances d'ordre supérieur) est :
-\[
+$$
 \begin{aligned}
 \gamma_2 &= \mathbb{E}[Y_t Y_{t-2}]  \\
 &= \mathbb{E}[(\theta_1 \varepsilon_{t-1} + \varepsilon_t)(\theta_1 \varepsilon_{t-3} + \varepsilon_{t-2})] \\
@@ -560,25 +560,25 @@ La deuxième autocovariance (et les autocovariances d'ordre supérieur) est :
 &= 0 + 0 + 0 + 0 \\
 &= 0.
 \end{aligned}
-\]
+$$
 
 Les autocorrélations sont donc :
-\[
+$$
 \rho_1 = \frac{\theta_1}{1 + \theta_1^2}, \quad \rho_s = 0 \quad \text{pour} \quad s \geq 2.
-\]
+$$
 
 ### A.2.3 ARMA(1,1)
 
 Un processus ARMA(1,1) est défini par :
-\[
+$$
 Y_t = \phi_1 Y_{t-1} + \theta_1 \varepsilon_{t-1} + \varepsilon_t.
-\]
-Il est stationnaire si \(|\phi_1| < 1\) et si \(\{\varepsilon_t\}\) est un bruit blanc. La dérivation de la variance et des autocovariances est plus complexe que pour un processus AR(1). Il est à noter que cette dérivation est plus longue et plus complexe que la résolution des équations de Yule-Walker.
+$$
+Il est stationnaire si $|\phi_1| < 1$ et si $\{\varepsilon_t\}$ est un bruit blanc. La dérivation de la variance et des autocovariances est plus complexe que pour un processus AR(1). Il est à noter que cette dérivation est plus longue et plus complexe que la résolution des équations de Yule-Walker.
 
-### Représentation MA(\(\infty\))
+### Représentation MA($\infty$)
 
-On commence par calculer la représentation MA(\(\infty\)) en utilisant la substitution rétroactive :
-\[
+On commence par calculer la représentation MA($\infty$) en utilisant la substitution rétroactive :
+$$
 \begin{aligned}
 Y_t &= \phi_1 Y_{t-1} + \theta_1 \varepsilon_{t-1} + \varepsilon_t \\
 &= \phi_1 (\phi_1 Y_{t-2} + \theta_1 \varepsilon_{t-2} + \varepsilon_{t-1}) + \theta_1 \varepsilon_{t-1} + \varepsilon_t \\
@@ -591,12 +591,12 @@ Y_t &= \phi_1 Y_{t-1} + \theta_1 \varepsilon_{t-1} + \varepsilon_t \\
 &= \varepsilon_t + (\phi_1 + \theta_1) \varepsilon_{t-1} + \phi_1 (\phi_1 + \theta_1) \varepsilon_{t-2} + \phi_1^2 (\phi_1 + \theta_1) \varepsilon_{t-3} + \dots \\
 &= \varepsilon_t + \sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-1-i}. 
 \end{aligned}
-\]
+$$
 
-### Variance (\(\gamma_0\))
+### Variance ($\gamma_0$)
 
 La variance est donnée par :
-\[
+$$
 \begin{aligned}
 \gamma_0 &= \text{Var}[Y_t] = \mathbb{E}[Y_t^2] \\
 &= \mathbb{E}\left[\left(\varepsilon_t + \sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-1-i}\right)^2\right] \\
@@ -610,12 +610,12 @@ La variance est donnée par :
 &= \sigma^2 \frac{1 - \phi_1^2 + (\phi_1 + \theta_1)^2}{1 - \phi_1^2} \\
 &= \sigma^2 \frac{1 + \theta_1^2 + 2 \phi_1 \theta_1}{1 - \phi_1^2}.
 \end{aligned}
-\]
+$$
 
-### Autocovariance d'ordre 1 (\(\gamma_1\))
+### Autocovariance d'ordre 1 ($\gamma_1$)
 
 L'autocovariance d'ordre 1 est donnée par :
-\[
+$$
 \begin{aligned}
 \gamma_1 &= \mathbb{E}[Y_t Y_{t-1}] \\
 &= \mathbb{E}\left[\left(\varepsilon_t + \sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-1-i}\right) \left(\varepsilon_{t-1} + \sum_{i=0}^{\infty} \phi_1^i (\phi_1 + \theta_1) \varepsilon_{t-2-i}\right)\right] \\
@@ -628,17 +628,17 @@ L'autocovariance d'ordre 1 est donnée par :
 &= \sigma^2 \frac{(\phi_1 + \theta_1)(1 - \phi_1^2) + \phi_1 (\phi_1 + \theta_1)^2}{1 - \phi_1^2} \\
 &= \sigma^2 \frac{(\phi_1 + \theta_1)(1 + \phi_1 \theta_1)}{1 - \phi_1^2}.
 \end{aligned}
-\]
+$$
 
 ### Autocorrélations
 
 L'autocorrélation d'ordre 1 est :
-\[
+$$
 \rho_1 = \frac{\gamma_1}{\gamma_0} = \frac{(\phi_1 + \theta_1)(1 + \phi_1 \theta_1)}{1 + \theta_1^2 + 2 \phi_1 \theta_1}.
-\]
+$$
 
 Les autocorrélations d'ordre supérieur suivent la récurrence :
-\[
+$$
 \rho_s = \phi_1 \rho_{s-1}, \quad s \geq 2.
-\]
+$$
 

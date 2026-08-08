@@ -1,0 +1,91 @@
+---
+title: "Chapitre 6 — Ouverture : modèles non linéaires"
+subtitle: "Économétrie des séries temporelles · M1 MBFA"
+# Configuration commune (thème, tableau blanc, découpage) : _quarto.yml à la racine
+format:
+  revealjs:
+    footer: "Économétrie des séries temporelles — Chapitre 6"
+---
+
+<!-- Version étudiante : engendrée automatiquement depuis la source
+     enseignante par 01-Slides/generer-version-etudiant.R.
+     Ne pas modifier ici — les changements seraient écrasés. -->
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(
+  #eval = FALSE,
+  echo = FALSE,
+  error = TRUE,
+  fig.width = 10, 
+  fig.height = 5,
+  dpi = 192,
+  fig.keep ="last",
+  message = FALSE,
+  warning = FALSE,
+  results = "markup"
+)
+```
+
+```{r}
+#| echo: false
+library(quantmod)
+library(fredr)
+fredr_set_key(Sys.getenv("FRED_API_KEY"))
+library(vars)
+library(forecast)
+library(ggplot2)
+library(gridExtra)
+library(dplyr)
+library(urca)
+library(astsa)
+library(aTSA)
+library(forecast)
+library(ppcor)
+library(MASS)
+```
+
+------------------------------------------------------------------------
+
+## Modèles Non Linéaires pour l'Analyse des Séries Temporelles
+
+- **Focus** : Processus linéaires de séries temporelles.
+- **Modèles non linéaires** : Fournissent des descriptions parcimonieuses des dynamiques des séries temporelles (notamment financières).
+- **Modèles clés** :
+  - Autorégressions à Changement de Régime (MSAR).
+  - Autorégressions à Seuil (TAR), en particulier SETAR.
+
+------------------------------------------------------------------------
+
+## Autorégressions à Changement de Régime (MSAR)
+
+- **Introduit par** : Hamilton (1989).
+- **Modèle** : Combine une autorégression avec un état latent déterminant les paramètres autorégressifs.
+- **Applications** : Surpasse les modèles linéaires pour les rendements d'actifs à basse fréquence (Perez-Quiros et Timmermann, 2000).
+
+------------------------------------------------------------------------
+
+### Définition : MSAR
+
+Un **MSAR à k états** est un processus stochastique avec :
+
+- **Dynamique** : Régie par un processus d'état markovien et une autorégression.
+- **États** : Étiquetés $1, 2, \dots, k$, notés $s_t$.
+- **Matrice de transition** $P$ :
+  $$
+  P = \begin{bmatrix}
+  p_{11} & p_{12} & \dots & p_{1k} \\
+  p_{21} & p_{22} & \dots & p_{2k} \\
+  \vdots & \vdots & \ddots & \vdots \\
+  p_{k1} & p_{k2} & \dots & p_{kk}
+  \end{bmatrix}
+  $$
+  où $p_{ij} = \Pr(s_{t+1} = i \mid s_t = j)$.
+
+------------------------------------------------------------------------
+
+### Probabilités Ergodiques
+
+- **Définition** : Probabilités inconditionnelles des états, notées $\pi = [\pi_1, \pi_2, \dots, \pi_k]'$.
+- **Calcul** : Solution de $\pi = P \pi$.
+- **Interprétation** : Vecteur propre normalisé de $P$ associé à la valeur propre unitaire.

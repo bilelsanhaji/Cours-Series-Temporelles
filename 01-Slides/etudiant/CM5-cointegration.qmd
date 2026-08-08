@@ -1,0 +1,651 @@
+---
+title: "Chapitre 5 — Cointégration et modèles à correction d'erreur"
+subtitle: "Économétrie des séries temporelles · M1 MBFA"
+# Configuration commune (thème, tableau blanc, découpage) : _quarto.yml à la racine
+format:
+  revealjs:
+    footer: "Économétrie des séries temporelles — Chapitre 5"
+---
+
+<!-- Version étudiante : engendrée automatiquement depuis la source
+     enseignante par 01-Slides/generer-version-etudiant.R.
+     Ne pas modifier ici — les changements seraient écrasés. -->
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(
+  echo = FALSE,
+  error = TRUE,
+  fig.width = 10,
+  fig.height = 5,
+  dpi = 192,
+  fig.keep = "last",
+  message = FALSE,
+  warning = FALSE,
+  results = "markup"
+)
+```
+
+```{r}
+#| label: libs
+#| include: false
+library(vars)
+library(urca)
+library(tseries)
+library(ggplot2)
+library(dplyr)
+```
+
+## Cointégration
+
+- La cointégration est la version VAR des racines unitaires
+- Établit des relations à long terme entre deux variables à racine unitaire
+  - La consommation a une racine unitaire, le revenu a une racine unitaire
+  - Consommation - Revenu : ????
+
+## Définition (Intégré d'Ordre 1)
+
+Une variable $y_{t}$ est intégrée d'ordre 1, ou $\mathsf{I}(1)$, si $y_{t}$ est non stationnaire et $\Delta y_{t}=y_{t}-y_{t-1}$ est stationnaire.
+
+------------------------------------------------------------------------
+
+## Cointégration
+
+## Définition (Cointégration Bivariée)
+
+$x_{t}$ et $y_{t}$ sont cointégrés si les deux sont I(1), et il existe un vecteur $\beta$ avec les deux éléments non nuls tels que
+
+$$
+\beta_{1} x_{t}-\beta_{2} y_{t} \sim I(0)
+$$
+
+- Lien fort entre $x_{t}$ et $y_{t}$
+- Les deux sont des marches aléatoires mais la différence retourne à la moyenne
+- Retour moyen à la tendance (tendance stochastique)
+
+------------------------------------------------------------------------
+
+## À quoi ressemble la cointégration ?
+
+$$\mathbf{y}_{t}=\boldsymbol{\Phi}_{i j} \mathbf{y}_{t-1}+\boldsymbol{\varepsilon}_{t} $$
+
+$$
+\boldsymbol{\Phi}_{11} =
+\begin{bmatrix}
+0.8 & 0.2 \\
+0.2 & 0.8
+\end{bmatrix}, \quad \lambda_i = 1, 0.6
+$$
+
+$$
+\boldsymbol{\Phi}_{21} =
+\begin{bmatrix}
+0.7 & 0.2 \\
+0.2 & 0.7
+\end{bmatrix}, \quad \lambda_i = 0.9, 0.5
+$$
+
+$$
+\boldsymbol{\Phi}_{12} =
+\begin{bmatrix}
+1 & 0 \\
+0 & 1
+\end{bmatrix}, \quad \lambda_i = 1, 1
+$$
+
+$$
+\boldsymbol{\Phi}_{22} =
+\begin{bmatrix}
+-0.3 & 0.3 \\
+0.1 & -0.2
+\end{bmatrix}, \quad \lambda_i = -0.43, -0.06
+$$
+
+------------------------------------------------------------------------
+
+# Persistance, Anti-persistance et Cointégration
+
+```{r}
+#| label: cointegration
+#| echo: false
+simulate_VAR1 <- function(Phi, nobs = 100, Sigma = diag(2)) {
+  k <- nrow(Phi)    
+  Y <- matrix(0, nrow = nobs, ncol = k) 
+  epsilon <- mvrnorm(nobs, mu = rep(0, k), Sigma = Sigma) # Bruit gaussien
+
+  for (t in 2:nobs) {
+    Y[t, ] <- Phi %*% Y[t-1, ] + epsilon[t, ]
+  }
+  return(as.data.frame(Y))
+}
+
+# Définition des matrices \Phi des slides
+Phi_11 <- matrix(c(0.8, 0.2, 0.2, 0.8), nrow = 2, byrow = TRUE)
+Phi_21 <- matrix(c(0.7, 0.2, 0.2, 0.7), nrow = 2, byrow = TRUE)
+Phi_12 <- matrix(c(1, 0, 0, 1), nrow = 2, byrow = TRUE)
+Phi_22 <- matrix(c(-0.3, 0.3, 0.1, -0.2), nrow = 2, byrow = TRUE)
+
+eigen(Phi_11)$values
+
+# Simulation des séries temporelles
+set.seed(1212)
+nobs <- 100
+data_11 <- simulate_VAR1(Phi_11, nobs)
+data_21 <- simulate_VAR1(Phi_21, nobs)
+data_12 <- simulate_VAR1(Phi_12, nobs)
+data_22 <- simulate_VAR1(Phi_22, nobs)
+ 
+colnames(data_11) <- colnames(data_21) <- colnames(data_12) <- colnames(data_22) <- c("y1", "y2")
+
+# Graph
+plot_VAR1 <- function(data, phi_label) {
+  data$Time <- 1:nrow(data)
+  ggplot(data, aes(x = Time)) +
+    geom_line(aes(y = y1, color = "y1")) +
+    geom_line(aes(y = y2, color = "y2")) +
+    labs(
+      title = bquote( ~ .(phi_label)),
+      x = "Temps", 
+      y = "Valeur", 
+      color = NULL # Supprime le titre de la légende
+    ) +
+    scale_color_manual(values = c("y1" = "darkblue", "y2" = "darkred"),
+                       labels = c(expression(y[1]), expression(y[2]))) + # Labels sans couleur
+    theme_minimal() +
+    theme(
+      plot.title = element_text(size = 10) # Réduction de la taille du titre
+    )
+}
+p1 <- plot_VAR1(data_11, bquote("Cointegration (" * Phi[11] * ")"))
+p2 <- plot_VAR1(data_21, bquote("Persistant, Stationnaire (" * Phi[21] * ")"))
+p3 <- plot_VAR1(data_12, bquote("Racines unitaires indépendantes (" * Phi[12] * ")"))
+p4 <- plot_VAR1(data_22, bquote("Antipersistant, Stationnaire avec (" * Phi[22] * ")"))
+
+
+grid.arrange(p1, p2, p3, p4, ncol = 2)
+
+```
+
+------------------------------------------------------------------------
+
+## Comment savons-nous quand un VAR est cointégré ?
+
+- La condition des valeurs propres détermine si un VAR(1) est cointégré
+
+$$
+\left[\begin{array}{c}
+y_{t} \\
+x_{t}
+\end{array}\right]=\left[\begin{array}{cc}
+.8 & .2 \\
+.2 & .8
+\end{array}\right]\left[\begin{array}{c}
+y_{t-1} \\
+x_{t-1}
+\end{array}\right]+\left[\begin{array}{c}
+\varepsilon_{1, t} \\
+\varepsilon_{2, t}
+\end{array}\right]
+$$
+
+- Cointégré si une seule valeur propre est unitaire.
+- Si tous inférieurs à 1 : ??
+- Si les deux 1 : deux racines unitaires indépendantes
+
+$$
+\begin{aligned}
+& \boldsymbol{\Phi}_{11}=\left[\begin{array}{cc}
+.8 & .2 \\
+.2 & .8
+\end{array}\right] \quad \boldsymbol{\Phi}_{12}=\left[\begin{array}{ll}
+1 & 0 \\
+0 & 1
+\end{array}\right] \\
+& \lambda_{i}=1,0.6 
+& \lambda_{i}=1,1 \\
+& \boldsymbol{\Phi}_{21}=\left[\begin{array}{cc}
+.7 & .2 \\
+.2 & .7
+\end{array}\right] \quad \boldsymbol{\Phi}_{22}=\left[\begin{array}{cc}
+-.3 & .3 \\
+.1 & -.2
+\end{array}\right] \\
+& \lambda_{i}=0.9,0.5 
+& \lambda_{i}=-0.43,-0.06
+\end{aligned}
+$$
+
+------------------------------------------------------------------------
+
+# Modèles de Correction d'Erreur
+
+- Point majeur de la cointégration
+  - Cointégré $\Leftrightarrow$ Modèle de correction d'erreur
+
+- Qu'est-ce qu'un modèle de correction d'erreur ?
+
+  - VAR cointégré :
+$$
+\left[\begin{array}{l}
+y_{t} \\
+x_{t}
+\end{array}\right]=\left[\begin{array}{ll}
+.8 & .2 \\
+.2 & .8
+\end{array}\right]\left[\begin{array}{c}
+y_{t-1} \\
+x_{t-1}
+\end{array}\right]+\left[\begin{array}{c}
+\varepsilon_{1, t} \\
+\varepsilon_{2, t}
+\end{array}\right]
+$$
+  - Modèle de correction d'erreur :
+$$
+\left[\begin{array}{c}
+\Delta y_{t} \\
+\Delta x_{t}
+\end{array}\right]=\left[\begin{array}{cc}
+-.2 & .2 \\
+.2 & -.2
+\end{array}\right]\left[\begin{array}{c}
+y_{t-1} \\
+x_{t-1}
+\end{array}\right]+\left[\begin{array}{c}
+\varepsilon_{1, t} \\
+\varepsilon_{2, t}
+\end{array}\right]
+$$
+  - Forme normalisée
+$$
+\left[\begin{array}{c}
+\Delta y_{t} \\
+\Delta x_{t}
+\end{array}\right]=\left[\begin{array}{c}
+-.2 \\
+.2
+\end{array}\right]\left[\begin{array}{ll}
+1 & -1
+\end{array}\right]\left[\begin{array}{c}
+y_{t-1} \\
+x_{t-1}
+\end{array}\right]+\left[\begin{array}{c}
+\varepsilon_{1, t} \\
+\varepsilon_{2, t}
+\end{array}\right]
+$$
+
+- $[1 \quad - 1]$ est le vecteur de cointégration
+- $[-.2 \quad .2]^{\prime}$ mesure la vitesse d'ajustement
+
+------------------------------------------------------------------------
+
+## De VAR à VECM
+
+$$
+\left[\begin{array}{c}
+y_{t} \\
+x_{t}
+\end{array}\right]=\left[\begin{array}{ll}
+.8 & .2 \\
+.2 & .8
+\end{array}\right]\left[\begin{array}{c}
+y_{t-1} \\
+x_{t-1}
+\end{array}\right]+\left[\begin{array}{c}
+\varepsilon_{1, t} \\
+\varepsilon_{2, t}
+\end{array}\right]
+$$
+
+Soustraire $\left[y_{t-1} x_{t-1}\right]^{\prime}$ des deux côtés
+
+$$
+\begin{aligned}
+& {\left[\begin{array}{c}
+y_{t} \\
+x_{t}
+\end{array}\right]-\left[\begin{array}{c}
+y_{t-1} \\
+x_{t-1}
+\end{array}\right]=\left[\begin{array}{ll}
+.8 & .2 \\
+.2 & .8
+\end{array}\right]\left[\begin{array}{c}
+y_{t-1} \\
+x_{t-1}
+\end{array}\right]-\left[\begin{array}{c}
+y_{t-1} \\
+x_{t-1}
+\end{array}\right]+\left[\begin{array}{c}
+\varepsilon_{1, t} \\
+\varepsilon_{2, t}
+\end{array}\right]} \\
+& {\left[\begin{array}{c}
+\Delta y_{t} \\
+\Delta x_{t}
+\end{array}\right]=\left(\left[\begin{array}{ll}
+.8 & .2 \\
+.2 & .8
+\end{array}\right]-\left[\begin{array}{ll}
+1 & 0 \\
+0 & 1
+\end{array}\right]\right)\left[\begin{array}{c}
+y_{t-1} \\
+x_{t-1}
+\end{array}\right]+\left[\begin{array}{c}
+\varepsilon_{1, t} \\
+\varepsilon_{2, t}
+\end{array}\right]} \\
+& {\left[\begin{array}{c}
+\Delta y_{t} \\
+\Delta x_{t}
+\end{array}\right]=\left[\begin{array}{cc}
+-.2 & .2 \\
+.2 & -.2
+\end{array}\right]\left[\begin{array}{c}
+y_{t-1} \\
+x_{t-1}
+\end{array}\right]+\left[\begin{array}{c}
+\varepsilon_{1, t} \\
+\varepsilon_{2, t}
+\end{array}\right]} \\
+& {\left[\begin{array}{c}
+\Delta y_{t} \\
+\Delta x_{t}
+\end{array}\right]=\left[\begin{array}{c}
+-.2 \\
+.2
+\end{array}\right]\left[\begin{array}{ll}
+1 & -1
+\end{array}\right]\left[\begin{array}{c}
+y_{t-1} \\
+x_{t-1}
+\end{array}\right]+\left[\begin{array}{c}
+\varepsilon_{1, t} \\
+\varepsilon_{2, t}
+\end{array}\right]}
+\end{aligned}
+$$
+
+------------------------------------------------------------------------
+
+## Vecteurs de cointégration
+
+- La relation de cointégration peut toujours être décomposée
+
+$$
+\begin{aligned}
+\Delta \mathbf{y}_{t} & =\boldsymbol{\pi} \mathbf{y}_{t-1}+\boldsymbol{\varepsilon}_{t} \\
+\boldsymbol{\pi}      &=\boldsymbol{\alpha} \boldsymbol{\beta}^{\prime}
+\end{aligned}
+$$
+
+- $\alpha$ mesure la vitesse de convergence
+- $\beta$ contiennent les vecteurs de cointégration
+- Le nombre de vecteurs de cointégration est $\operatorname{rank}\left(\boldsymbol{\alpha} \boldsymbol{\beta}^{\prime}\right)$
+
+$$
+\boldsymbol{\alpha} \boldsymbol{\beta}^{\prime}=\left[\begin{array}{cccc}
+0.3 & 0.2 & -0.36 \\
+0.2 & 0.5 & -0.35 \\
+-0.3 & -0.3 & 0.39
+\end{array}\right]
+$$
+
+------------------------------------------------------------------------
+
+## Détermination des vecteurs de cointégration
+
+$$
+\begin{gathered}
+\Delta \mathbf{y}_{t}=\boldsymbol{\pi} \mathbf{y}_{t-1}+\boldsymbol{\varepsilon}_{t} \\
+\boldsymbol{\pi}=\left[\begin{array}{ccc}
+0.3 & 0.2 & -0.36 \\
+0.2 & 0.5 & -0.35 \\
+-0.3 & -0.3 & 0.39
+\end{array}\right]
+\end{gathered}
+$$
+
+- Mettre $\boldsymbol{\pi}$ sous forme échelonnée par ligne
+
+$$
+\text { Forme Échelonnée par Ligne }=\left[\begin{array}{ccc}
+1 & 0 & -1 \\
+0 & 1 & -0.3 \\
+0 & 0 & 0
+\end{array}\right]
+$$
+
+- Rappel $\boldsymbol{\pi} =\boldsymbol{\alpha} \boldsymbol{\beta}^{\prime}$
+
+$$
+\boldsymbol{\beta}=\left[\begin{array}{rr}
+1 & 0 \\
+0 & 1 \\
+-1 & -.3
+\end{array}\right] \quad\quad \boldsymbol{\alpha}=\left[\begin{array}{rr}
+.3 & .2 \\
+.2 & .5 \\
+-.3 & -.3
+\end{array}\right]
+$$
+
+------------------------------------------------------------------------
+
+## Résolution des vecteurs de cointégration
+
+$$
+\begin{gathered}
+\boldsymbol{\alpha} \boldsymbol{\beta}^{\prime}=\left[\begin{array}{ccc}
+0.3 & 0.2 & -0.36 \\
+0.2 & 0.5 & -0.35 \\
+-0.3 & -0.3 & 0.39
+\end{array}\right] \\
+\text { Forme Échelonnée par Ligne } \Rightarrow\left[\begin{array}{ccc}
+1 & 0 & -1 \\
+0 & 1 & -0.3 \\
+0 & 0 & 0
+\end{array}\right] \\
+\boldsymbol{\beta}=\left[\begin{array}{ll}
+1 & 0 \\
+0 & 1 \\
+\beta_{1} & \beta_{2}
+\end{array}\right]
+\end{gathered}
+$$
+
+et $\boldsymbol{\alpha}$ a 6 paramètres inconnus. $\boldsymbol{\alpha} \boldsymbol{\beta}^{\prime}$ peut être combiné pour produire
+
+$$
+\boldsymbol{\pi}=\left[\begin{array}{lll}
+\alpha_{11} & \alpha_{12} & \alpha_{11} \beta_{1}+\alpha_{12} \beta_{2} \\
+\alpha_{21} & \alpha_{22} & \alpha_{21} \beta_{1}+\alpha_{22} \beta_{2} \\
+\alpha_{31} & \alpha_{32} & \alpha_{31} \beta_{1}+\alpha_{32} \beta_{2}
+\end{array}\right]
+$$
+
+------------------------------------------------------------------------
+
+## Tester la cointégration
+
+- Deux tests pour la cointégration
+  - Engle-Granger
+  - Johansen
+- Nous allons nous concentrer sur Engle-Granger
+  - Simple et intuitif
+  - Seulement applicable avec 1 relation de cointégration
+- Tester la propriété clé de la cointégration : la différence est I(0)
+- La plupart du travail est une simple OLS
+
+$$
+y_{t}=\delta_{0}+\beta x_{t}+\varepsilon_{t}
+$$
+
+- Reste du travail est de tester $\hat{\varepsilon}_{t}$ pour une racine unitaire
+- Johansen teste les valeurs propres de $\pi=\alpha \beta^{\prime}$ directement.
+
+------------------------------------------------------------------------
+
+# Procédure Engle-Granger
+
+## Algorithme (Test Engle-Granger)
+
+1. Commencer par analyser $x_{t}$ et $y_{t}$ isolément. Les deux doivent être des racines unitaires pour envisager la cointégration.
+2. Estimer la relation à long terme
+$$
+y_{t}=\delta_{0}+\beta x_{t}+\varepsilon_{t}
+$$
+et tester $H_{0}: \gamma=0$ contre $H_{1}: \gamma<0$ dans la régression ADF
+
+$$
+\Delta \hat{\varepsilon}_{t}=\gamma \hat{\varepsilon}_{t-1}+\delta_{1} \Delta \hat{\varepsilon}_{t-1}+\ldots+\delta_{p} \Delta \hat{\varepsilon}_{t-P}+\eta_{t}
+$$
+
+3. En utilisant les paramètres estimés, spécifier et estimer la forme de correction d'erreur de la relation,
+
+$$
+\left[\begin{array}{c}
+\Delta x_{t} \\
+\Delta y_{t}
+\end{array}\right]=\begin{array}{r}
+\pi_{01} \\
+\pi_{02}
+\end{array}+\begin{array}{r}
+\alpha_{1} \hat{\varepsilon}_{t} \\
+\alpha_{2} \hat{\varepsilon}_{t}
+\end{array}+\boldsymbol{\pi}_{1}\left[\begin{array}{c}
+\Delta x_{t-1} \\
+\Delta y_{t-1}
+\end{array}\right]+\ldots+\boldsymbol{\pi}_{P}\left[\begin{array}{c}
+\Delta x_{t-P} \\
+\Delta y_{t-P}
+\end{array}\right]+\left[\begin{array}{c}
+\eta_{1, t} \\
+\eta_{2, t}
+\end{array}\right]
+$$
+
+4. Évaluer le modèle
+
+------------------------------------------------------------------------
+
+## Considérations Engle-Granger
+
+- Termes déterministes
+  - Pas de termes déterministes : seulement dans des circonstances spéciales
+  
+  $$
+  y_{t}=\beta x_{t}+\varepsilon_{t}
+  $$
+  
+  - Constante : cas standard
+  
+  $$
+  y_{t}=\delta_{0}+\beta x_{t}+\varepsilon_{t}
+  $$
+  
+  - Constante et tendance temporelle : permettre différents taux de croissance/tendances temporelles dans les variables
+
+  $$
+  y_{t}=\delta_{0}+\delta_{1} t+\beta x_{t}+\varepsilon_{t}
+  $$
+
+## Valeurs Critiques
+
+- Les valeurs critiques dépendent des déterministes dans la régression CI
+  - Les modèles avec plus de déterministes ont des valeurs critiques plus basses (plus négatives)
+- Les valeurs critiques dépendent du nombre de variables I(1) du côté droit
+  - Les modèles plus grands ont des valeurs critiques plus basses
+
+------------------------------------------------------------------------
+
+## Exemple : cay
+
+- La relation consommation-richesse agrégée a été une série cointégrée intéressante dans la littérature financière récente
+- A relancé le CCAPM
+- Trois composantes :
+  - Consommation (c)
+  - Richesse en actifs (a)
+  - Revenu du travail (richesse humaine) (y)
+- Écart par rapport à la relation à long terme lié au rendement attendu
+- Relation de cointégration : $c_{t}+0.643-0.249 a_{t}-0.785 y_{t}$
+
+ |  | Tests de racine unitaire |  |  |
+ | :--: | :--: | :--: | :--: |
+ | Série | T-stat | P-val | Décalages ADF |
+ | $c$ | $-1.198$ | 0.674 | 5 |
+ | $a$ | $-0.205$ | 0.938 | 3 |
+ | $y$ | $-2.302$ | 0.171 | 0 |
+ | $\hat{\varepsilon}_{t}^{c}$ | $-2.706$ | 0.383 | 1 |
+ | $\hat{\varepsilon}_{t}^{a}$ | $-2.573$ | 0.455 | 0 |
+ | $\hat{\varepsilon}_{t}^{y}$ | $-2.679$ | 0.398 | 1 |
+
+------------------------------------------------------------------------
+
+## Modèle Vectoriel de Correction d'Erreur
+
+- VECM estimé en utilisant les résidus de la régression de cointégration
+
+::: {.small}
+$$
+\left[\begin{array}{c}
+\Delta c_{t} \\
+\Delta a_{t} \\
+\Delta y_{t}
+\end{array}\right]=\left[\begin{array}{c}
+0.003 \\
+(0.000) \\
+0.004 \\
+(0.014) \\
+0.003 \\
+(0.000)
+\end{array}\right]+\left[\begin{array}{c}
+-0.000 \\
+(0.281) \\
+0.002 \\
+(0.037) \\
+0.000 \\
+(0.515)
+\end{array}\right] \hat{\varepsilon}_{t-1}+\left[\begin{array}{ccc}
+0.192 & 0.102 & 0.139 \\
+0.005) & (0.000) & (0.004) \\
+0.282 & 0.220 & -0.149 \\
+(0.116) & (0.006) & (0.414) \\
+0.369 & 0.061 & -0.139 \\
+(0.000) & (0.088) & (0.140)
+\end{array}\right]\left[\begin{array}{c}
+\Delta c_{t-1} \\
+\Delta a_{t-1} \\
+\Delta y_{t-1}
+\end{array}\right]+\boldsymbol{\eta}_{t}
+$$
+\normalsize 
+
+- Valeurs p entre parenthèses
+- Estimation de la relation de cointégration n'a aucun effet sur les erreurs standard
+  - Converge rapidement $(T)$
+  - Les paramètres VECM convergent à la racine $\sqrt{T}$
+:::
+
+------------------------------------------------------------------------
+
+## Régression Fallacieuse et Équilibre
+
+- La prudence est nécessaire lorsqu'on travaille avec des données I(1)
+  - I(0) sur I(0) : Le cas habituel. Les arguments asymptotiques standards s'appliquent.
+  - I(1) sur I(0) : Cette régression est déséquilibrée.
+  - I(1) sur I(1) : Cointégration ou régression fallacieuse.
+  - I(0) sur I(1) : Cette régression est déséquilibrée.
+- La régression fallacieuse peut conduire à de grandes statistiques t lorsque les séries sont indépendantes.
+  - Deux processus I(1) non liés, $x_t$ et $y_t$ :
+    $$
+    x_t = x_{t-1} + \varepsilon_t
+    $$
+    $$
+    y_t = y_{t-1} + \eta_t
+    $$
+  - Lorsque $T = 50$, environ 80% des statistiques $\mathsf{t}$ sont significatives
+  - Toujours vérifier pour I(1) lors de l'utilisation de données de séries temporelles
+  - Si les deux sont I(1), assurez-vous qu'ils sont cointégrés.

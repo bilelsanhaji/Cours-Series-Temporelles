@@ -1,0 +1,101 @@
+---
+title: "Chapitre 0 — Présentation générale"
+subtitle: "Économétrie des séries temporelles · M1 MBFA"
+# Configuration commune (thème, tableau blanc, découpage) : _quarto.yml à la racine
+format:
+  revealjs:
+    footer: "Économétrie des séries temporelles — Chapitre 0"
+---
+
+<!-- Version étudiante : engendrée automatiquement depuis la source
+     enseignante par 01-Slides/generer-version-etudiant.R.
+     Ne pas modifier ici — les changements seraient écrasés. -->
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(
+  echo = FALSE,
+  error = TRUE,
+  fig.width = 10,
+  fig.height = 5,
+  dpi = 192,
+  fig.keep = "last",
+  message = FALSE,
+  warning = FALSE,
+  results = "markup"
+)
+```
+
+------------------------------------------------------------------------
+
+# De quoi il s'agit
+
+Les données de séries temporelles posent deux difficultés que l'analyse transversale ignore :
+
+- les variables sont corrélées entre elles **à un instant donné**,
+- mais aussi **dans le temps**,
+- et leurs moments eux-mêmes peuvent varier.
+
+Nous partons des processus **univariés stationnaires**, puis étendons aux processus **non stationnaires** et **multivariés**.
+
+```{r}
+#| label: riverflow
+library(readr)
+riverflowUKdata <- "https://raw.githubusercontent.com/bilelsanhaji/Cours-Series-Temporelles/refs/heads/main/04-Data/riverflowUK.csv"
+riverflowUK <- read_delim(riverflowUKdata,
+                       delim = ",",
+                       escape_double = FALSE,
+                       col_types = cols(YYYYMM = col_date(format = "%Y%m")),
+                       comment = "#", trim_ws = TRUE)
+
+RFUKdate = as.Date(riverflowUK$Date)
+par(mfrow = c(1, 2), mar = c(2, 5, 3, 1))
+plot(RFUKdate, riverflowUK$Data, type = "l", main = "Helmsdale, 1975 - 2022", xlab = "", ylab = "m3/s")
+plot(RFUKdate[84:148], riverflowUK$Data[84:148], type = "l", main = "Une année", xlab = "", ylab = "m3/s")
+```
+
+------------------------------------------------------------------------
+
+# Plan du cours
+
+| | Chapitre | Ce que vous saurez faire |
+|---|---|---|
+| **1** | Introduction et concepts essentiels | Caractériser un processus stochastique, lire une ACF |
+| **2** | Processus ARMA stationnaires | Identifier, estimer et valider un ARMA |
+| **3** | Racines unitaires | Tester la non-stationnarité, choisir la spécification du test |
+| **4** | Séries temporelles multivariées | Estimer un VAR, tester Granger, lire une IRF |
+| **5** | Cointégration et correction d'erreur | Reconnaître une relation de long terme, situer un VECM |
+| **6** | Ouverture : modèles non linéaires | Situer les modèles à changement de régime |
+
+**11 séances de 3 × 50 min**, environ moitié cours, moitié travaux dirigés et travaux sur machine.
+
+------------------------------------------------------------------------
+
+# Objectifs et outils
+
+**À la fin du semestre, vous devez pouvoir :**
+
+- lire un article empirique en macroéconomie ou en finance,
+- **reproduire** son analyse,
+- la critiquer,
+- produire votre propre travail empirique.
+
+**Les travaux sur machine se font en `R` ou en `Python`, au choix.**
+
+Les deux sont pris en charge : chaque fiche de TP a un corrigé dans chaque langage, et une table de correspondance entre les fonctions des deux écosystèmes est fournie.
+
+------------------------------------------------------------------------
+
+# Évaluation
+
+| Composante | Poids | Modalité |
+|---|---|---|
+| **Partiel final sur table** | 60 % | 2 h, sans document |
+| **3 TP notés sur machine** | 40 % | Séances 7, 9 et 11 — en séance, individuels |
+
+**Chaque étudiant travaille sur sa propre série** (une station météo différente par étudiant). Vos résultats numériques ne seront ceux de personne d'autre.
+
+Ce qui est noté : la **démarche** et l'**interprétation**, pas la sortie brute. Un résultat gênant correctement discuté vaut mieux qu'un résultat propre non commenté.
+
+**Toutes les communications passent par Moodle et le dépôt GitHub.**
