@@ -1,0 +1,143 @@
+---
+title: "Chapitre 0 — Présentation générale"
+subtitle: "Économétrie des séries temporelles · M1 MBFA"
+# Configuration commune (thème, tableau blanc, découpage) : _quarto.yml à la racine
+format:
+  revealjs:
+    footer: "Économétrie des séries temporelles — Chapitre 0"
+---
+
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,
+  fig.width = 10,
+  fig.height = 5,
+  dpi = 192,
+  fig.keep = "last",
+  message = FALSE,
+  warning = FALSE,
+  results = "markup"
+)
+```
+
+
+<!-- comme \vspace{} -->
+
+
+---
+
+# Vue générale du cours
+
+De la théorie des probabilités et de l'analyse de régression à l'économétrie des séries temporelles
+
+Les données de séries temporelles posent un certain nombre de problèmes par rapport à l'analyse transversale :
+
+- Corrélations entre variables à un moment donné,
+
+- Mais aussi corrélations dans le temps.
+
+- De plus, les données peuvent ne pas être stables, mais les moments des données peuvent varier dans le temps.
+
+Par conséquent, dans ce cours, nous visons à analyser les interactions dynamiques et multivariées dans les processus évolutifs et non stationnaires.
+
+En premier lieu, nous considérons les processus de séries temporelles univariées stationnaires
+
+Puis nous étendons l'analyse aux processus non stationnaires et aux processus multivariés.
+
+---
+
+# Exemples de Modèles
+
+**Analyse Univariée** (Dynamique) : $y_t = \alpha y_{t-1} + \beta y_{t-2} + \varepsilon_t + \theta \varepsilon_{t-1}$
+
+**Analyse Multivariée** (Statique/Dynamique) : $y_t = \alpha x_t + \beta x_{t-1} + \gamma y_{t-1} + \varepsilon_t$
+
+**Modèle Multivarié Statique** : $Y_t = \begin{bmatrix} y_{1,t} \\ \vdots \\ y_{k,t} \end{bmatrix} = AX_t + \varepsilon_t$
+
+**Modèle VAR** : $Y_t = AY_{t-1} + \varepsilon_t$
+
+**Modèle VEC** : $\Delta Y_t = \Pi Y_{t-1} + B \Delta Y_{t-1} + \varepsilon_t$
+
+**VAR Structurel** (SVAR) : $BY_t = AY_{t-1} + \varepsilon_t$
+
+**GARCH(1,1)** : $h_t = \omega + \alpha \varepsilon^2_{t-1} + \beta h_{t-1}$
+
+**BEKK(1,1,1)** : $H_t = C C' + A \varepsilon_{t-1} \varepsilon'_{t-1} A' + B H_{t-1} B'$
+
+---
+
+# Plan de cours 
+
+Chapitre 0 : Présentation Générale
+
+Chapitre 1 : Introduction et Révision des Concepts Essentiels des Séries Temporelles 
+
+Chapitre 2 : Processus ARMA stationnaires
+
+Chapitre 3 : Racines Unitaires
+
+Chapitre 4 : Séries Temporelles Multivariées
+
+Chapitre 5 : Introduction aux Modèles Univariés Non-Linéaires
+
+---
+
+# Objectifs
+
+Lire un article empirique en macroéconomie/finance.
+
+Reproduire une analyse empirique.
+
+Avoir un regard critique sur les travaux empiriques publiés.
+
+Produire votre propre travail empirique.
+
+Résoudre des modèles stochastiques et faire des prévisions.
+
+---
+
+# Évaluation
+
+40% (TD) : Projet individuel
+
+- Le choix du langage informatique est contraint à R : 
+  Comprendre le programme que vous utilisez et le documenter correctement avec toutes les citations 
+nécessaires des sources originales.
+
+60% (CM) : Examen final sur table
+
+---
+
+# moodle et github
+
+La page du cours est régulièrement actualisée. 
+
+Il faut donc s'y rendre régulièrement.
+
+Toutes les communications passent par là !!
+
+---
+
+## Helmsdale at Kilpherid
+
+Flux d'une rivière (id 2001) : $m^3/s$, moyenne par jour, 01/01/1975 - 30/09/2022
+https://nrfa.ceh.ac.uk/data/station/download?stn=2001&dt=gdf
+
+```{r}
+#| echo: false
+library(readr)
+riverflowUKdata <- "https://raw.githubusercontent.com/bilelsanhaji/Cours-Series-Temporelles/refs/heads/main/04-Data/riverflowUK.csv"
+riverflowUK <- read_delim(riverflowUKdata, 
+                       delim = ",",
+                       escape_double = FALSE,
+                       col_types = cols(YYYYMM = col_date(format = "%Y%m")), 
+                       comment = "#", trim_ws = TRUE)
+
+RFUKdate = as.Date(riverflowUK$Date)
+par(mfrow = c(2, 1), mar = c(2, 6, 4, 1))
+plot(RFUKdate,riverflowUK$Data,type = "l", main = "1975 - 2022",  xlab="", ylab = "m3/s")
+plot(RFUKdate[84:148],riverflowUK$Data[84:148],type = "l", main = "1 année", ylab = "m3/s")
+```

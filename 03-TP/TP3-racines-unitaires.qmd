@@ -1,0 +1,68 @@
+---
+title: "Économétrie des Séries Temporelles"
+author: "Fiche TD `R` #3"
+date: "Racines unitaires"
+format: pdf
+---
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,
+  fig.width = 10, 
+  fig.height = 5,
+  dpi = 600,
+  fig.keep ="last",
+  message = FALSE,
+  warning = FALSE,
+  results = "markup"
+)
+```
+
+```{r}
+#| label: bibliotheques
+#| echo: false
+##############
+## Packages ##
+##############
+library(tseries)
+library(quantmod)
+library(ggplot2)
+library(forecast)
+library(astsa)
+library(readr)
+library(TSA)
+```
+
+### Exercice 1 : Analyse des prix de l'or (2005)
+
+Récupérez le prix quotidien de l'or (en dollars par once) pour l'année 2005 sur Yahoo Finance (ticker 'GC=F'). Vous commenterez chaque étape et chaque résultat.
+
+**1. Graphique de la série temporelle des prix de l'or**
+
+a.  Téléchargez les données quotidiennes de l'or pour l'année 2005.
+b.  Affichez un graphique de la série temporelle des prix de l'or.
+c.  Interprétez le graphique. Quelles tendances ou patterns observez-vous ?
+
+**2. Graphique des rendements de l'or**
+
+a.  Calculez les rendements de l'or ainsi $R_t=\log\left(\frac{P_t}{P_{t-1}}\right)\times100$ où $P_t$ est le prix de l'or à la date $t$. Pourquoi utilise-t-on cette transformation ?
+b.  Affichez un graphique de la série temporelle des rendements.
+c.  Interprétez ce graphique. Comment se comporte la série transformée par rapport à la série originale ?
+
+**3. ACF des rendements de l'or**
+
+a.  Calculez et affichez l'ACF (Autocorrelation Function) échantillonnée pour les rendements de l'or.
+b.  Analysez les caractéristiques de l'ACF. Les autocorrélations sont-elles significatives ? Que suggèrent-elles sur la structure de la série ?
+c.  Discutez si les résultats de l'ACF sont compatibles avec l'hypothèse d'une marche aléatoire. Quelles propriétés de l'ACF soutiennent ou contredisent cette hypothèse ?
+
+**4. Histogramme des rendements de l'or**
+
+a.  Affichez un histogramme des rendements de l'or.
+b.  Interprétez l'histogramme. Quelle est la distribution des rendements ? Est-elle symétrique ? Y a-t-il des valeurs aberrantes ?
+
+**5. QQ-plot des rendements de l'or**
+
+a.  Affichez un graphique quantile-quantile (QQ-plot) des rendements de l'or par rapport à une distribution normale.
+b.  Interprétez le QQ-plot. Les rendements suivent-elles une distribution normale ? Quels écarts par rapport à la normalité observez-vous ?

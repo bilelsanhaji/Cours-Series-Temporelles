@@ -1,0 +1,79 @@
+# =====================================================================
+#  CONTENU ENSEIGNANT — ne doit jamais être publié
+# =====================================================================
+
+# Déroulé des séances, notes de préparation
+06-Enseignant/
+
+# Corrigés des TD et des TP.
+# Ils sont diffusés APRÈS chaque séance, un par un, en forçant l'ajout :
+#     git add -f 02-TD/corriges/TD1-proprietes-stochastiques-corrige.pdf
+#     git commit -m "Corrigé du TD 1"
+# Une fois ajouté au suivi, un fichier reste suivi malgré cette règle.
+02-TD/corriges/
+03-TP/corriges/
+
+# Sources d'origine, variantes non retenues, brouillons
+99-Archive/
+
+# Anciens rendus Beamer des chapitres : périmés depuis le passage à
+# reveal.js, et concurrents des HTML publiés. Les notes de cours de
+# 01-Slides/notes/ ne sont PAS concernées, elles restent en PDF.
+01-Slides/*.pdf
+00-Syllabus/*.pdf
+
+# Lanceurs macOS personnels (chemins absolus de votre machine)
+*.command
+
+# --- À décommenter si vous ne pouvez pas rediffuser ces documents -----
+# Chapitres d'un cours de financial econometrics d'un tiers : leur
+# rediffusion sur un dépôt public dépend de la licence d'origine.
+# 05-Eval/references/
+
+
+# =====================================================================
+#  Artefacts de compilation
+# =====================================================================
+
+# Tout le rendu du profil « tableau » atterrit ici : HTML non autonomes,
+# destinés à la salle uniquement. Le script de publication vérifie en plus
+# qu'aucun HTML non autonome n'a été rendu en place par mégarde.
+_tableau/
+
+*_files/
+*_cache/
+.quarto/
+_freeze/
+
+# LaTeX
+*.aux
+*.log
+*.out
+*.toc
+*.nav
+*.snm
+*.vrb
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+
+# R / RStudio
+.Rproj.user/
+.Rhistory
+.RData
+.Ruserdata
+.Renviron
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+
+
+# =====================================================================
+#  Rendus des étudiants et divers
+# =====================================================================
+rendus/
+*.zip
+.DS_Store
+Thumbs.db

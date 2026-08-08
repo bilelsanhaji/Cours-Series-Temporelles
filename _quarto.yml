@@ -1,0 +1,55 @@
+# Configuration du dépôt.
+#
+# Deux modes de rendu pour les chapitres :
+#
+#   quarto render 01-Slides/CM2-arma.qmd
+#       → un fichier HTML UNIQUE, autonome, sans dépendance externe.
+#         C'est la version à projeter et à distribuer aux étudiants.
+#
+#   quarto render 01-Slides/CM2-arma.qmd --profile tableau
+#       → active le tableau blanc (annotation en direct sur les slides,
+#         touche B pour le tableau, C pour le stylo).
+#         Produit un HTML + un dossier `*_files/` : NE PAS distribuer,
+#         garder pour votre usage en salle.
+#
+# Le plugin chalkboard est incompatible avec `embed-resources`, d'où les
+# deux profils. Voir 01-Slides/README.md.
+
+project:
+  title: "Économétrie des séries temporelles — M1 MBFA"
+  render:
+    - "00-Syllabus/*.qmd"
+    - "01-Slides/*.qmd"
+    - "01-Slides/notes/*.qmd"
+    - "02-TD/**/*.qmd"
+    - "03-TP/**/*.qmd"
+    - "05-Eval/**/*.qmd"
+    - "06-Enseignant/*.qmd"
+    - "!99-Archive/"
+
+format:
+  revealjs:
+    theme: [default, theme.scss]
+    # Les frames Beamer étaient séparées par des filets horizontaux, pas par
+    # des titres. slide-level 0 conserve ce découpage à l'identique : seuls
+    # les `---` créent une slide, les `#` et `##` restent des titres internes.
+    slide-level: 0
+    slide-number: c/t
+    show-slide-number: all
+    transition: none
+    width: 1280
+    height: 760
+    incremental: false
+    scrollable: true
+    code-line-numbers: false
+    embed-resources: true
+    chalkboard: false
+    html-math-method: mathjax
+
+# Libellés générés (table des matières, figures) en français
+lang: fr
+author: "Bilel Sanhaji — Université Paris 8"
+
+execute:
+  warning: false
+  message: false

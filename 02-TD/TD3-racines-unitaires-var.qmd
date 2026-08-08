@@ -1,0 +1,105 @@
+---
+title: "Économétrie des Séries Temporelles"
+author: "Fiche TD #3"
+date: "Racine unitaire et VAR"
+format: pdf
+---
+### Exercice 1 
+
+Identifiez chacun des modèles suivants comme des modèles ARMA spécifiques et indiquez s'ils sont stationnaires ($\{w_t\}$ est un bruit blanc de moyenne nulle).
+
+a. $z_t = z_{t-1} - 0.25 z_{t-2} + w_t + 0.5 w_{t-1}$
+b. $z_t = 2 z_{t-1} - z_{t-2} + w_t$
+c. $z_t = 0.5 z_{t-1} + 0.5 z_{t-2} + w_t - 0.5 w_{t-1} + 0.25 w_{t-2}$
+
+```{r}
+nobs <- 100
+z <- numeric(nobs)
+w <- rnorm(nobs)
+z[1] <- w[1]
+z[2] <- w[2] + w[1]
+for(t in 3:nobs){
+  z[t] <- z[t-1] - 0.25*z[t-2] + w[t] + 0.5*w[t-1]
+}
+plot(z, type = "l", main = "a.")
+```
+```{r}
+nobs <- 100
+z <- numeric(nobs)
+w <- rnorm(nobs)
+z[1] <- w[1]
+z[2] <- w[2] + w[1]
+for(t in 3:nobs){
+  z[t] <- 2*z[t-1] - z[t-2] + w[t]
+}
+plot(z, type = "l", main = "b.")
+```
+```{r}
+nobs <- 100
+z <- numeric(nobs)
+w <- rnorm(nobs)
+z[1] <- w[1]
+z[2] <- w[2] + w[1]
+for(t in 3:nobs){
+  z[t] <- 0.5*z[t-1] + 0.5*z[t-2] + w[t] - 0.5*w[t-1] + 0.25*w[t-2]
+}
+plot(z, type = "l", main = "c.")
+```
+
+### Exercice 2
+
+On souhaite étudier les interactions entre trois variables macroéconomiques : 
+
+1. **PIB**, noté \( y_t \),
+2. **Taux d'inflation**, noté \( \pi_t \),
+3. **Taux d'intérêt**, noté \( r_t \).
+
+On suppose que ces variables suivent un modèle VAR(2) de la forme :
+
+\[
+\begin{pmatrix}
+y_t \\
+\pi_t \\
+r_t
+\end{pmatrix}
+=
+\begin{pmatrix}
+c_1 \\
+c_2 \\
+c_3
+\end{pmatrix}
++
+\begin{pmatrix}
+\phi_{11}^1 & \phi_{12}^1 & \phi_{13}^1 \\
+\phi_{21}^1 & \phi_{22}^1 & \phi_{23}^1 \\
+\phi_{31}^1 & \phi_{32}^1 & \phi_{33}^1
+\end{pmatrix}
+\begin{pmatrix}
+y_{t-1} \\
+\pi_{t-1} \\
+r_{t-1}
+\end{pmatrix}
++
+\begin{pmatrix}
+\phi_{11}^2 & \phi_{12}^2 & \phi_{13}^2 \\
+\phi_{21}^2 & \phi_{22}^2 & \phi_{23}^2 \\
+\phi_{31}^2 & \phi_{32}^2 & \phi_{33}^2
+\end{pmatrix}
+\begin{pmatrix}
+y_{t-2} \\
+\pi_{t-2} \\
+r_{t-2}
+\end{pmatrix}
++
+\begin{pmatrix}
+\varepsilon_{1t} \\
+\varepsilon_{2t} \\
+\varepsilon_{3t}
+\end{pmatrix}
+\]
+
+où \( \varepsilon_t = (\varepsilon_{1t}, \varepsilon_{2t}, \varepsilon_{3t})' \) est un 
+vecteur de bruits blancs tels que \( \mathsf{E}[\boldsymbol{\varepsilon}_t] = \mathbf{0} \) et \( \mathsf{E}[\varepsilon_t \varepsilon_t'] = \boldsymbol{\Sigma} \), avec \( \boldsymbol{\Sigma} \) une matrice de variance-covariance.
+
+a. Écrivez explicitement les trois équations du modèle VAR(2) pour \( y_t \), \( \pi_t \) et \( r_t \).
+b. Quelle est la signification économique des coefficients \( \phi_{12}^1 \) et \( \phi_{23}^2 \) ?

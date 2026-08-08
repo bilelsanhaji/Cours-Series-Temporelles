@@ -1,0 +1,147 @@
+---
+title: "Stationnarité des processus AR : racines et conditions"
+author: "Note de cours"
+date: "2025/2026"
+format: pdf
+geometry: "left=2.5cm,right=2.5cm,top=2.5cm,bottom=2.5cm"
+---
+## 1. Le modèle AR(p) et la question de la stationnarité
+
+Un processus autorégressif d'ordre $p$, noté AR($p$), est défini par :
+
+$$Y_t = \phi_1 Y_{t-1} + \phi_2 Y_{t-2} + \cdots + \phi_p Y_{t-p} + \varepsilon_t, \quad \varepsilon_t \sim \text{WN}(0, \sigma^2)$$
+
+La stationnarité (au sens faible) requiert que la moyenne, la variance et les autocovariances soient constantes dans le temps. Pour un AR($p$), cette condition se vérifie à partir des **racines d'un polynôme caractéristique**. Il existe deux conventions dans la littérature, qui conduisent à des conditions en apparence opposées — mais mathématiquement équivalentes.
+
+---
+
+## 2. Deux conventions, une seule réalité
+
+### Convention 1 — Polynôme en $z$ (opérateur retard)
+
+On réécrit le modèle en faisant passer tous les termes en $Y$ à gauche :
+
+$$Y_t - \phi_1 Y_{t-1} - \cdots - \phi_p Y_{t-p} = \varepsilon_t \quad \Longleftrightarrow \quad \Phi(z)\, Y_t = \varepsilon_t$$
+
+où $\Phi(z) = 1 - \phi_1 z - \phi_2 z^2 - \cdots - \phi_p z^p$ est le **polynôme retard**.
+
+> **Condition de stationnarité :** toutes les racines de $\Phi(z) = 0$ sont de module **strictement supérieur à 1** (en dehors du cercle unité).
+
+### Convention 2 — Polynôme en $\lambda$ (valeurs propres)
+
+On pose $\lambda = 1/z$, ce qui revient à multiplier $\Phi(z) = 0$ par $\lambda^p$ :
+
+$$\lambda^p - \phi_1 \lambda^{p-1} - \cdots - \phi_p = 0$$
+
+Ce sont les valeurs propres de la matrice compagnon associée au système AR.
+
+> **Condition de stationnarité :** toutes les racines de ce polynôme sont de module **strictement inférieur à 1** (à l'intérieur du cercle unité).
+
+### Pourquoi les conditions s'inversent-elles ?
+
+Parce que $\lambda = 1/z$. Si $|z| > 1$, alors $|\lambda| = |1/z| < 1$, et réciproquement. Les deux approches testent exactement la même propriété, exprimée dans des espaces inverses l'un de l'autre. **Il ne faut jamais mélanger les deux dans un même raisonnement.**
+
+---
+
+## 3. Application : AR(2)
+
+$$Y_t = 0.4\, Y_{t-1} + 0.3\, Y_{t-2} + \varepsilon_t, \quad \varepsilon_t \sim \text{WN}(0, \sigma^2)$$
+
+### Convention 1 — Racines de $\Phi(z) = 0$
+
+On réécrit :
+
+$$\Phi(z) = 1 - 0.4z - 0.3z^2 = 0$$
+
+On multiplie par $-1$ pour obtenir un trinôme standard :
+
+$$0.3z^2 + 0.4z - 1 = 0$$
+
+**Discriminant :**
+
+$$\Delta = 0.4^2 + 4 \times 0.3 \times 1 = 0.16 + 1.20 = 1.36$$
+
+**Racines :**
+
+$$z_{1,2} = \frac{-0.4 \pm \sqrt{1.36}}{2 \times 0.3} = \frac{-0.4 \pm 1.166}{0.6}$$
+
+$$z_1 = \frac{-0.4 + 1.166}{0.6} = \frac{0.766}{0.6} \approx 1.277 \qquad z_2 = \frac{-0.4 - 1.166}{0.6} = \frac{-1.566}{0.6} \approx -2.610$$
+
+**Conclusion :** $|z_1| \approx 1.28 > 1$ et $|z_2| \approx 2.61 > 1$. Les deux racines sont en dehors du cercle unité → le processus est **stationnaire**.
+
+---
+
+### Convention 2 — Racines de $\lambda^2 - \phi_1\lambda - \phi_2 = 0$
+
+On pose directement $\lambda = 1/z$, ce qui donne :
+
+$$\lambda^2 - 0.4\lambda - 0.3 = 0$$
+
+**Discriminant :**
+
+$$\Delta = 0.4^2 + 4 \times 0.3 = 0.16 + 1.20 = 1.36$$
+
+**Racines :**
+
+$$\lambda_{1,2} = \frac{0.4 \pm \sqrt{1.36}}{2} = \frac{0.4 \pm 1.166}{2}$$
+
+$$\lambda_1 = \frac{0.4 + 1.166}{2} = \frac{1.566}{2} \approx 0.783 \qquad \lambda_2 = \frac{0.4 - 1.166}{2} = \frac{-0.766}{2} \approx -0.383$$
+
+**Conclusion :** $|\lambda_1| \approx 0.78 < 1$ et $|\lambda_2| \approx 0.38 < 1$. Les deux racines sont à l'intérieur du cercle unité → le processus est **stationnaire**.
+
+---
+
+### Vérification du lien $\lambda = 1/z$
+
+$$\lambda_1 = \frac{1}{z_1} = \frac{1}{1.277} \approx 0.783 \checkmark \qquad \lambda_2 = \frac{1}{z_2} = \frac{1}{-2.610} \approx -0.383 \checkmark$$
+
+Les deux approches donnent bien le même résultat.
+
+---
+
+## 4. Condition suffisante pour un AR(2)
+
+Pour un AR(2) $Y_t = \phi_1 Y_{t-1} + \phi_2 Y_{t-2} + \varepsilon_t$, on peut éviter le calcul des racines en vérifiant les trois inégalités suivantes (conditions nécessaires et suffisantes) :
+
+$$|\phi_2| < 1 \qquad \phi_1 + \phi_2 < 1 \qquad \phi_2 - \phi_1 < 1$$
+
+Application numérique ($\phi_1 = 0.4$, $\phi_2 = 0.3$) :
+
+$$|0.3| = 0.3 < 1 \checkmark \qquad 0.4 + 0.3 = 0.7 < 1 \checkmark \qquad 0.3 - 0.4 = -0.1 < 1 \checkmark$$
+
+Ces trois conditions définissent le **triangle de stationnarité** dans le plan $(\phi_1, \phi_2)$, représenté ci-dessous.
+
+```{r}
+#| label: triangle
+#| echo: false
+#| fig-height: 4
+#| fig-width: 5
+#| fig-align: 'center'
+phi1 <- seq(-2.1, 2.1, length.out = 500)
+phi2 <- seq(-1.1, 1.1, length.out = 500)
+grid <- expand.grid(phi1 = phi1, phi2 = phi2)
+grid$stationary <- with(grid, abs(phi2) < 1 & phi1 + phi2 < 1 & phi2 - phi1 < 1)
+
+plot(NA, xlim = c(-2.1, 2.1), ylim = c(-1.1, 1.1),
+     xlab = expression(phi[1]), ylab = expression(phi[2]),
+     main = "Triangle de stationnarité AR(2)")
+polygon(c(-2, 0, 2), c(-1, 1, -1), col = "lightblue", border = NA)
+abline(h = 0, v = 0, col = "grey70", lty = 2)
+points(0.4, 0.3, pch = 19, col = "red", cex = 1.5)
+text(0.4, 0.3, labels = expression(paste("(", phi[1], "=0.4, ", phi[2], "=0.3)")),
+     pos = 4, cex = 0.8, col = "red")
+```
+
+Le point $(\phi_1, \phi_2) = (0.4,\, 0.3)$ se trouve bien à l'intérieur du triangle.
+
+---
+
+## 5. Récapitulatif
+
+|  | Polynôme | Racines | Condition |
+|----------|------|---|-----------|
+| **Convention 1** (lag operator) | $1 - \phi_1 z - \phi_2 z^2 = 0$ | $z_1,\, z_2$ | $\|z_i\| > 1$ |
+| **Convention 2** (valeurs propres) | $\lambda^2 - \phi_1\lambda - \phi_2 = 0$ | $\lambda_1,\, \lambda_2$ | $\|\lambda_i\| < 1$ |
+| **Condition directe** (AR(2) seulement) | — | — | $|\phi_2|<1$, $\phi_1+\phi_2<1$, $\phi_2-\phi_1<1$ |
+
+Les trois méthodes sont équivalentes. La convention 1 est dominante dans la littérature théorique (Hamilton, Brockwell & Davis). La convention 2 est fréquente en algèbre linéaire et en certains manuels d'économétrie appliquée. La condition directe est pratique pour un AR(2) mais ne se généralise pas facilement à l'ordre $p > 2$.

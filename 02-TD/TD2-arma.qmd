@@ -1,0 +1,28 @@
+---
+title: "Économétrie des Séries Temporelles"
+author: "Fiche TD #2"
+date: "Processus ARMA stationnaires"
+format: pdf
+---
+### Exercice 1
+
+Trouvez la fonction d'autocorrélation du processus stationnaire définit par 
+
+$$Y_t = 5  - \frac{1}{2}e_{t-1} + \frac{1}{4}e_{t-2} + e_t $$
+
+### Exercice 2 
+
+Soit $\{Y_t\}$ un processus stationnaire AR(1)  avec $-1<\phi<+1$
+
+  (a) Trouvez la fonction d'autovariance de $W_t=\Delta Y_t=Y_t-Y_{t-1}$ 
+    en fonction de $\phi$ et $\sigma_{e}^2$.
+  (b) En particulier, montrez que $\mathsf{var}(W_t)=2\sigma_{e}^2/(1+\phi)$.
+
+### Exercice 3
+
+Pour un modèle ARMA(1,2) $Y_t=0.8Y_{t-1}+0.7\varepsilon_{t-1}+0.6\varepsilon_{t-2}+\varepsilon_{t}$
+montrez que
+
+  (a) $\rho_k=0.8\rho_{k-1}$
+  (b) $\rho_2=0.8\rho_1+0.6\sigma_{\varepsilon}^2/\gamma_0$
+

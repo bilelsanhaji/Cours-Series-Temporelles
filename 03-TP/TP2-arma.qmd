@@ -1,0 +1,105 @@
+---
+title: "Économétrie des Séries Temporelles"
+author: "Fiche TD `R` #2"
+date: "Processus ARMA stationnaires"
+format: pdf
+---
+ 
+```{r}
+#| label: setup
+#| include: false
+knitr::opts_chunk$set(
+  echo = TRUE,
+  error = TRUE,
+  fig.width = 10, 
+  fig.height = 5,
+  dpi = 600,
+  fig.keep ="last",
+  message = FALSE,
+  warning = FALSE,
+  results = "markup"
+)
+```
+
+### Packages
+
+```{r}
+#| label: bibliotheques
+library(readr)
+library(zoo)
+library(astsa)
+library(forecast)
+library(stats)
+library(tseries)
+library(aTSA)
+#install.packages("aTSA")
+```
+
+### Données (identiques au TP1)
+
+Nice : <https://github.com/bilelsanhaji/Cours-Series-Temporelles/blob/main/04-Data/SH_MIN006088001.csv>
+
+Paris : <https://github.com/bilelsanhaji/Cours-Series-Temporelles/blob/main/04-Data/SH_MIN175114001.csv>
+
+```{r}
+#| label: DataImport
+urlSHnice <- "https://raw.githubusercontent.com/bilelsanhaji/Cours-Series-Temporelles/refs/heads/main/04-Data/SH_MIN006088001.csv"
+InsoNice <- read_delim(urlSHnice, 
+                       delim = ";",
+                       escape_double = FALSE,
+                       col_types = cols(YYYYMM = col_date(format = "%Y%m")), 
+                       comment = "#", trim_ws = TRUE)
+
+urlSHparis <- "https://raw.githubusercontent.com/bilelsanhaji/Cours-Series-Temporelles/refs/heads/main/04-Data/SH_MIN175114001.csv"
+InsoParis <- read_delim(urlSHparis,
+                        delim = ";",
+                        escape_double = FALSE,
+                        col_types = cols(YYYYMM = col_date(format = "%Y%m")),
+                        comment = "#", trim_ws = TRUE)
+```
+
+```{r}
+#| label: value
+Nice_ts = ts(InsoNice$VALEUR)
+Paris_ts = ts(InsoParis$VALEUR)
+```
+
+
+### Exercice 1
+
+À partir des données d'insolation de Nice et Paris, utilisez les séries pour
+
+(a) donner une représentation graphique et tester statistiquement :
+
+1. la stationarité
+2. l'autocorrélation
+3. la normalité
+
+
+(b) estimer et interpréter un AR(1) pour chaque série, puis, sur les résidus :
+
+1.  tester autocorrelation, normalité et hétéroscédasticité
+2.  interprétez tous les résultats obtenus 
+3.  discutez la différence qu'il y a entre les séries 
+
+### Exercice 2 
+
+Simulez un processus AR(1) stationnaire avec 50 observations. Puis
+
+(a) "testez" graphiquement et testez statistiquement :
+
+1.  la stationarité
+2.  l'autocorrélation
+3.  la normalité 
+
+(b) estimez la série simulée et discutez les résultats
+
+(c) reproduire les étapes (a) et (b) avec 5000 observations
+
+1.  la stationarité
+2.  l'autocorrélation
+3.  la normalité 
+
+(b) estimez la série simulée et discutez les résultats
+
+
